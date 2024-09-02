@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spaces</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="titlebar">
+            <p>Spaces</p>
+            <button id="minimize"><span class="fluent-icons">&#xE921</span></button>
+            <button id="quit" red><span class="fluent-icons">&#xE8BB</span></button>
+        </div>
+        <div class="topbar">
+            <form class="search" onsubmit="return false">
+                <input type="search" id="search" placeholder="Search or create projects" spellcheck="false"
+                    autocomplete="off">
+                <button id="create" type="submit" tooltip data-tooltip="Create" ripple><span
+                        class="material-symbols-outlined">add</span></button>
+                <button id="openFolder" tooltip data-tooltip="Open folder" ripple><span
+                        class="material-symbols-outlined">folder_open</span></button>
+                <button id="terminal" tooltip data-tooltip="Open terminal" ripple><span
+                        class="material-symbols-outlined">terminal</span></button>
+                <button id="refresh" tooltip data-tooltip="Refresh" ripple><span
+                        class="material-symbols-outlined">sync</span></button>
+            </form>
+        </div>
+        <div class="projects">
+            <div class="project" ripple>
+                <p>Project name</p>
+                <button ripple><span class="material-symbols-outlined">edit</span></button>
+                <button ripple><span class="material-symbols-outlined">delete</span></button>
+                <button ripple><span class="material-symbols-outlined">folder_open</span></button>
+                <button ripple><span class="material-symbols-outlined">terminal</span></button>
+            </div>
+        </div>
+    </div>
+    <div class="tooltips"></div>
+</body>
+
+<script src="js/index.js" type="module"></script>
+
+</html>
