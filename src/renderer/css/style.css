@@ -40,16 +40,10 @@
     direction: ltr;
 }
 
-@font-face {
-    font-family: "Inter";
-    font-display: swap;
-    src: url("../fonts/inter.ttf");
-}
-
 * {
     margin: 0;
     padding: 0;
-    font-family: "Inter", sans-serif;
+    font-family: "Be Vietnam Pro", sans-serif;
     user-select: none;
     box-sizing: border-box;
     -webkit-font-smoothing: antialiased;
@@ -66,19 +60,57 @@ body {
     overflow: hidden;
 }
 
-@keyframes unBlur {
-    to {
-        filter: blur(0px);
-    }
-}
-
 .wrapper {
     display: flex;
     flex-direction: column;
     height: 100dvh;
     border: 1px solid rgb(52, 50, 56);
-    filter: blur(1000px);
-    animation: unBlur .25s .25s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes hide {
+    to {
+        opacity: 0;
+    }
+}
+
+.wrapper .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: absolute;
+    z-index: 9999;
+    content: "";
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(20, 18, 24);
+    pointer-events: none;
+    animation: hide .25s 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes show {
+    to {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+}
+
+.wrapper .loading img {
+    width: 50px;
+    height: 50px;
+    opacity: 0;
+    transform: translateY(-25px);
+    animation: show .25s .25s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.wrapper .loading p {
+    font-size: 21px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(-25px);
+    animation: show .25s .25s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 .titlebar {
@@ -164,7 +196,6 @@ body {
     border-radius: 999px;
     border: 0;
     outline: none;
-    cursor: pointer;
     background-color: transparent;
     color: inherit;
     overflow: hidden;
@@ -214,19 +245,23 @@ body {
     background-color: rgb(25, 23, 29);
     box-shadow: 0 0 0 1px rgb(52, 50, 56);
     padding-inline: 15px;
-    cursor: pointer;
     outline: none;
     overflow: hidden;
     transition: margin-bottom .25s cubic-bezier(0.25, 1, 0.5, 1),
         min-height .25s cubic-bezier(0.25, 1, 0.5, 1),
         height .25s cubic-bezier(0.25, 1, 0.5, 1),
         opacity .25s cubic-bezier(0.25, 1, 0.5, 1),
-        box-shadow .15s cubic-bezier(0.25, 1, 0.5, 1);
+        box-shadow .25s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .projects .project:hover {
     box-shadow: 0 0 0 2px rgb(208, 188, 255), 0 0 25px -10px rgb(208, 188, 255);
     color: rgb(208, 188, 255);
+    transition: margin-bottom 0s,
+        min-height 0s,
+        height 0s,
+        opacity 0s,
+        box-shadow 0s;
 }
 
 .projects .project:last-of-type {

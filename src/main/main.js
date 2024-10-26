@@ -12,12 +12,6 @@ const gotTheLock = app.requestSingleInstanceLock();
 const iconPath = path.join(app.getAppPath(), "assets/icon.ico");
 const img = nativeImage.createFromPath(iconPath);
 
-Object.defineProperty(app, "isPackaged", {
-    get() {
-        return true;
-    },
-});
-
 const createWindow = () => {
     mainWindow = new BrowserWindow({
         width: 600,
@@ -108,10 +102,10 @@ else {
         tray = new Tray(img);
 
         const contextMenu = Menu.buildFromTemplate([
-            { label: `Spaces (v${app.getVersion()})`, type: "normal", enabled: false, icon: img.resize({ width: 16, height: 16 }) },
+            { label: `Spaces (v${app.getVersion()})`, enabled: false, icon: img.resize({ width: 16, height: 16 }) },
             { type: "separator" },
-            { label: "Show", type: "normal", click: function () { mainWindow.show(); } },
-            { label: "Check for updates", type: "normal", click: async function () {
+            { label: "Show", click: function () { mainWindow.show(); } },
+            { label: "Check for updates", click: async function () {
                     const result = await autoUpdater.checkForUpdates();
                     const latestVersion =  result["updateInfo"]["version"];
 
@@ -125,7 +119,7 @@ else {
                     }
                 } },
             { type: "separator" },
-            { label: "Quit Spaces", type: "normal", click: function () { mainWindow.destroy(); app.quit(); } }
+            { label: "Quit Spaces", click: function () { mainWindow.destroy(); app.quit(); } }
         ]);
 
         tray.setToolTip(`Spaces (v${app.getVersion()})`);
