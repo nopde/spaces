@@ -15,6 +15,7 @@
         "appId": "com.nopde.spaces",
         "productName": "Spaces",
         "icon": "icon.ico",
+        "forceCodeSigning": false,
         "win": {
             "artifactName": "SpacesSetup.exe",
             "target": "nsis-web"
