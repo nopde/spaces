@@ -56,15 +56,24 @@ function createRipple(rippleElement, rippleColor, rippleOpacity, rippleNoGradien
 
         if (min <= size / 2) {
             properSize = size * 1.5;
+
+            if (rippleNoGradient) {
+                properSize = size;
+            }
         }
         else {
             properSize = size * (1 + min / size);
+
+            if (rippleNoGradient) {
+                properSize = size * 1.25;
+            }
         }
 
+        let finishDelay = 0;
         if (rippleNoGradient) {
-            properSize = size;
             ripple.style.background = `rgba(${rippleColor}, ${rippleOpacity})`;
             ripple.style.animation = "grow .25s cubic-bezier(0.25, 1, 0.5, 1) forwards";
+            finishDelay = 150;
         }
 
         ripple.style.width = `${properSize}px`;
@@ -83,17 +92,21 @@ function createRipple(rippleElement, rippleColor, rippleOpacity, rippleNoGradien
 
         rippleElement.addEventListener("pointerup", event => {
             if (animationEnded) {
-                ripple.style.opacity = 0;
                 setTimeout(() => {
-                    ripple.remove();
-                }, 300);
-            }
-            else {
-                ripple.addEventListener("animationend", event => {
                     ripple.style.opacity = 0;
                     setTimeout(() => {
                         ripple.remove();
                     }, 300);
+                }, finishDelay);
+            }
+            else {
+                ripple.addEventListener("animationend", event => {
+                    setTimeout(() => {
+                        ripple.style.opacity = 0;
+                        setTimeout(() => {
+                            ripple.remove();
+                        }, 300);
+                    }, finishDelay);
                 });
             }
         });

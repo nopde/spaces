@@ -258,6 +258,7 @@ body {
 }
 
 .projects .project:hover {
+    background-color: rgb(35, 33, 39);
     box-shadow: 0 0 0 2px rgb(208, 188, 255), 0 0 25px -10px rgb(208, 188, 255);
     color: rgb(208, 188, 255);
     transition: margin-bottom .25s cubic-bezier(0.25, 1, 0.5, 1),
