@@ -1,4 +1,4 @@
-function createRipple(rippleElement, rippleColor, rippleOpacity) {
+function createRipple(rippleElement, rippleColor, rippleOpacity, rippleNoGradient = false) {
     const existingSurface = rippleElement.querySelector(":scope > ripple-surface");
     if (existingSurface) {
         return;
@@ -59,6 +59,12 @@ function createRipple(rippleElement, rippleColor, rippleOpacity) {
         }
         else {
             properSize = size * (1 + min / size);
+        }
+
+        if (rippleNoGradient) {
+            properSize = size;
+            ripple.style.background = `rgba(${rippleColor}, ${rippleOpacity})`;
+            ripple.style.animation = "grow .25s cubic-bezier(0.25, 1, 0.5, 1) forwards";
         }
 
         ripple.style.width = `${properSize}px`;
@@ -124,6 +130,6 @@ export function checkRippleElements(root = document) {
         const hasRippleOpacity = rippleElement.hasAttribute("ripple-opacity");
         const rippleOpacity = hasRippleOpacity ? rippleElement.getAttribute("ripple-opacity") : "0.08";
 
-        createRipple(rippleElement, rippleColor, rippleOpacity);
+        createRipple(rippleElement, rippleColor, rippleOpacity, true);
     });
 }
