@@ -14,7 +14,7 @@ function createModal(name, content) {
                 padding: 0;
                 box-sizing: border-box;
                 user-select: none;
-                font-family: "Be Vietnam Pro", sans-serif;
+                font-family: "Inter", sans-serif;
                 -webkit-font-smoothing: antialiased;
             }
 
@@ -94,6 +94,7 @@ function createModal(name, content) {
                 border: none;
                 padding: 10px 20px;
                 border-radius: 999px;
+                cursor: pointer;
                 transition: background-color .1s cubic-bezier(0.25, 1, 0.5, 1);
             }
 
@@ -130,7 +131,7 @@ function createModal(name, content) {
                 margin: 0;
                 padding: 0;
                 box-sizing: border-box;
-                font-family: "Be Vietnam Pro", sans-serif;
+                font-family: "Inter", sans-serif;
                 user-select: none;
                 -webkit-font-smoothing: antialiased;
             }
@@ -147,6 +148,7 @@ function createModal(name, content) {
                 border: none;
                 padding: 10px 20px;
                 border-radius: 999px;
+                cursor: pointer;
                 transition: background-color .1s cubic-bezier(0.25, 1, 0.5, 1);
             }
 
