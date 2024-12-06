@@ -66,14 +66,10 @@ function createModal(name, content) {
             .modal-title {
                 display: flex;
                 align-items: center;
-                justify-content: space-between;
+                justify-content: right;
                 gap: 10px;
                 padding-top: 20px;
-                padding-bottom: 10px;
-                margin-inline: -20px;
-                padding-inline: 20px;
-                border-bottom: 1px solid rgba(255, 255, 255, .1);
-                box-shadow: 0 0 5px rgb(0, 0, 0, .25);
+                padding-inline: 10px;
             }
 
             .modal-title p {
@@ -95,6 +91,7 @@ function createModal(name, content) {
                 padding: 10px 20px;
                 border-radius: 999px;
                 cursor: pointer;
+                margin-left: auto;
                 transition: background-color .1s cubic-bezier(0.25, 1, 0.5, 1);
             }
 
@@ -114,9 +111,8 @@ function createModal(name, content) {
 
         <div class="modal">
             <div class="modal-title">
-                <p>${name}</p>
-
-                <button ripple>Close</button>
+                ${name ? `<p>${name}</p>` : ""}
+                <button id="close" ripple>Close</button>
             </div>
             <div class="modal-content"></div>
         </div>
@@ -187,8 +183,7 @@ function createModal(name, content) {
     document.body.appendChild(modalContainer);
 
     const modal = modalContainer.shadowRoot.querySelector(".modal");
-    const modalTitle = modal.querySelector(".modal-title");
-    const modalButton = modalTitle.querySelector("button");
+    const modalButton = modal.querySelector("#close");
 
     const callback = (root) => {
         checkRippleElements(root);
@@ -234,8 +229,7 @@ export function renameModal(projectName) {
         </form>
     `;
 
-    const title = `Rename <span style="text-decoration: underline 1px; color: rgb(208, 188, 255)">${projectName}</span>`;
-    let modalContainer = createModal(title, modalHTML);
+    let modalContainer = createModal("Rename", modalHTML);
 
     const confirmButton = modalContainer.shadowRoot.querySelector("div.modal-content").shadowRoot.querySelector("button");
     const input = modalContainer.shadowRoot.querySelector("div.modal-content").shadowRoot.querySelector("input");
@@ -258,8 +252,7 @@ export function deleteModal(projectName) {
         <button class="modal-button" type="submit" ripple>Confirm</button>
     `;
 
-    const title = `Delete <span style="text-decoration: underline 1px; color: rgb(208, 188, 255)">${projectName}</span>`;
-    let modalContainer = createModal(title, modalHTML);
+    let modalContainer = createModal("Delete", modalHTML);
 
     const confirmButton = modalContainer.shadowRoot.querySelector("div.modal-content").shadowRoot.querySelector("button");
 
