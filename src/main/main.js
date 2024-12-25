@@ -105,9 +105,11 @@ else {
             { label: `Spaces (v${app.getVersion()})`, enabled: false, icon: img.resize({ width: 16, height: 16 }) },
             { type: "separator" },
             { label: "Show", click: function () { mainWindow.show(); } },
-            { label: "Check for updates", click: async function () {
+            {
+                label: "Check for updates",
+                click: async function () {
                     const result = await autoUpdater.checkForUpdates();
-                    const latestVersion =  result["updateInfo"]["version"];
+                    const latestVersion = result["updateInfo"]["version"];
 
                     if (app.getVersion() === latestVersion) {
                         dialog.showMessageBox({
@@ -117,7 +119,9 @@ else {
                             detail: "You are using the latest version of Spaces."
                         });
                     }
-                } },
+
+                }
+            },
             { type: "separator" },
             { label: "Quit Spaces", click: function () { mainWindow.destroy(); app.quit(); } }
         ]);
