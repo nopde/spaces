@@ -59,9 +59,9 @@ export function checkTooltipElements(root = document) {
 
         tooltips.appendChild(tooltipContainer);
 
+        const tooltipRect = tooltipContainer.getBoundingClientRect();
+        const tooltipElementRect = tooltipElement.getBoundingClientRect();
         tooltipElement.addEventListener("mouseenter", event => {
-            const tooltipRect = tooltipContainer.getBoundingClientRect();
-            const tooltipElementRect = tooltipElement.getBoundingClientRect();
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
 
@@ -82,6 +82,8 @@ export function checkTooltipElements(root = document) {
             tooltip.classList.remove("hidden");
         });
 
-        tooltipElement.addEventListener("mouseleave", () => { tooltip.classList.add("hidden"); });
+        tooltipElement.addEventListener("mouseleave", () => {
+            tooltip.classList.add("hidden");
+        });
     });
 }
