@@ -1,0 +1,38 @@
+{
+    "author": "nopde",
+    "repository": "https://github.com/nopde/soaces",
+    "name": "spaces",
+    "version": "0.0.1",
+    "description": "Windows VSCode Project Manager",
+    "license": "MIT",
+    "main": "src/main/main.js",
+    "scripts": {
+        "start": "electron .",
+        "build": "electron-builder build",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "build": {
+        "appId": "spaces",
+        "productName": "Spaces",
+        "icon": "icon.ico",
+        "forceCodeSigning": false,
+        "win": {
+            "artifactName": "SpacesSetup.exe",
+            "target": "nsis-web"
+        },
+        "nsisWeb": {
+            "oneClick": false,
+            "allowToChangeInstallationDirectory": true
+        },
+        "directories": {
+            "output": "dist"
+        }
+    },
+    "devDependencies": {
+        "electron": "^35.0.0",
+        "electron-builder": "^25.1.8"
+    },
+    "dependencies": {
+        "electron-updater": "^6.3.9"
+    }
+}

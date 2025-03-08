@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spaces</title>
+
+    <link rel="stylesheet" href="fonts/inter/inter.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="loading">
+            <img src="../../assets/icon.ico" alt="Loading...">
+            <p>Spaces</p>
+        </div>
+        <div class="titlebar">
+            <p>Spaces</p>
+            <button id="minimize"><span class="fluent-icons">&#xE921</span></button>
+            <button id="quit" red><span class="fluent-icons">&#xE8BB</span></button>
+        </div>
+        <div class="topbar">
+            <div class="search">
+                <ascended-text-input id="search" type="search"
+                    placeholder="Search or create projects"></ascended-text-input>
+                <ascended-button id="configuration">
+                    <span class="icons">&#xE713;</span>
+                </ascended-button>
+            </div>
+            <div class="search-buttons">
+                <ascended-button id="openFolder">
+                    <span class="icons">&#xE838;</span>
+                    Open projects folder
+                </ascended-button>
+                <ascended-button id="terminal">
+                    <span class="icons">&#xE756;</span>
+                    Open terminal
+                </ascended-button>
+                <ascended-button id="refresh" primary primary-color="208, 188, 255">
+                    <span class="icons">&#xE72C;</span>
+                    Refresh projects
+                </ascended-button>
+            </div>
+        </div>
+        <div class="projects"></div>
+    </div>
+    <div class="tooltips"></div>
+</body>
+
+<script src="js/modules/ascended-framework/elements.js" type="module"></script>
+<script src="js/index.js" type="module"></script>
+
+</html>
