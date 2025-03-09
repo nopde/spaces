@@ -221,6 +221,10 @@ window.electronAPI.onConfigChange((newConfig) => {
     applyConfig();
 });
 
+window.electronAPI.onRefreshProjects(async () => {
+    await updateProjects();
+});
+
 searchBar.focus();
 
 searchBar.addEventListener("keydown", async (event) => {

@@ -33,6 +33,7 @@
         "electron-builder": "^25.1.8"
     },
     "dependencies": {
+        "chokidar": "^4.0.3",
         "electron-updater": "^6.3.9"
     }
 }

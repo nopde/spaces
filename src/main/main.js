@@ -4,10 +4,13 @@ const { autoUpdater } = require("electron-updater");
 const fs = require("original-fs");
 const fs_promises = require("original-fs").promises;
 const path = require("node:path");
+const chokidar = require("chokidar");
 
 let mainWindow;
 let tray;
 const gotTheLock = app.requestSingleInstanceLock();
+
+let projectsFolderWatcher = null;
 
 const iconPath = path.join(app.getAppPath(), "assets/icon.ico");
 const img = nativeImage.createFromPath(iconPath);
@@ -30,10 +33,34 @@ function getConfig() {
 }
 
 function setConfig(newConfig) {
+    let oldConfig = config;
     config = newConfig;
     mainWindow.webContents.send("config-change", config);
+
+    if (oldConfig.projectsFolder !== config.projectsFolder) {
+        watchProjectsFolder();
+    }
+
     fs.writeFileSync(configPath, JSON.stringify(config, null, 4));
     return config;
+}
+
+function watchProjectsFolder() {
+    if (projectsFolderWatcher) {
+        projectsFolderWatcher.close();
+    }
+
+    projectsFolderWatcher = chokidar.watch(config.projectsFolder, {
+        depth: 0,
+    });
+
+    projectsFolderWatcher.on("addDir", () => {
+        mainWindow.webContents.send("refresh-projects");
+    });
+
+    projectsFolderWatcher.on("unlinkDir", () => {
+        mainWindow.webContents.send("refresh-projects");
+    });
 }
 
 const createWindow = () => {
@@ -76,6 +103,8 @@ else {
         else {
             setConfig(defaultConfig);
         }
+
+        watchProjectsFolder();
 
         mainWindow.on("show", () => {
             mainWindow.webContents.zoomFactor = 1.0;

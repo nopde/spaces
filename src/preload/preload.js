@@ -28,5 +28,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
     },
     quit: () => ipcRenderer.invoke("quit"),
     minimize: () => ipcRenderer.invoke("minimize"),
-    onResetScroll: (callback) => ipcRenderer.on("reset-scroll", callback)
+    onResetScroll: (callback) => ipcRenderer.on("reset-scroll", callback),
+    onRefreshProjects: (callback) => ipcRenderer.on("refresh-projects", callback),
 });
