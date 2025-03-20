@@ -4,17 +4,11 @@
     src: url("../fonts/fluent_icons.ttf");
 }
 
-.fluent-icons {
+.icons {
     font-family: "Segoe Fluent Icons";
-    font-weight: normal;
-    font-style: normal;
-    line-height: 1;
-    letter-spacing: normal;
-    text-transform: none;
-    display: inline-block;
-    white-space: nowrap;
-    word-wrap: normal;
-    direction: ltr;
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
 }
 
 * {
@@ -155,24 +149,28 @@ body {
     display: flex;
     align-items: center;
     gap: 5px;
+    border-top: 1px solid rgb(45, 45, 50);
 }
 
 .search ascended-text-input {
     flex: 1 1;
 }
 
-.search ascended-button {
-    height: 100%;
-}
-
 .search-buttons {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 10px;
+    gap: 5px;
     font-size: 14px;
-    border-top: 1px solid rgb(45, 45, 50);
     padding: 10px;
+}
+
+.search-buttons ascended-button {
+    width: 100%;
+}
+
+.search-buttons #configuration {
+    width: max-content;
+    height: 100%;
 }
 
 .projects {
@@ -241,7 +239,6 @@ body[reduced-motion] .project {
     padding: 10px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 10px;
     background-color: rgb(20, 20, 25);
 }
@@ -249,9 +246,42 @@ body[reduced-motion] .project {
 .project .project-title p {
     font-size: 18px;
     margin-left: 10px;
+    margin-right: auto;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+}
+
+.project .favourite-star {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 9999px;
+    color: rgba(255, 255, 255, .1);
+    background-color: transparent;
+    outline: none;
+    cursor: pointer;
+    transition: all 150ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+body[reduced-motion] .project .favourite-star {
+    transition-duration: 0ms;
+}
+
+.project .favourite-star:hover,
+.project .favourite-star:active {
+    color: rgba(228, 208, 255, .75);
+    background-color: rgba(255, 255, 255, .1);
+}
+
+.project .favourite-star:active {
+    filter: brightness(0.75);
+}
+
+.project .favourite-star.favourite {
+    color: rgb(228, 208, 255);
 }
 
 .project .project-buttons {

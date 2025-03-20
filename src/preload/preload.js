@@ -26,6 +26,12 @@ contextBridge.exposeInMainWorld("electronAPI", {
     selectFolder: (currentPath) => {
         return ipcRenderer.invoke("selectFolder", currentPath);
     },
+    isGitInstalled: () => {
+        return ipcRenderer.invoke("isGitInstalled");
+    },
+    cloneProject: (url, projectName) => {
+        return ipcRenderer.invoke("cloneProject", url, projectName);
+    },
     quit: () => ipcRenderer.invoke("quit"),
     minimize: () => ipcRenderer.invoke("minimize"),
     onResetScroll: (callback) => ipcRenderer.on("reset-scroll", callback),

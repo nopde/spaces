@@ -6,10 +6,11 @@ import { Modal } from "./modules/ascended-framework/modal.js";
 // Variables
 
 let currentConfig = null;
+let isGitInstalled = null;
 
 const quitBtn = document.getElementById("quit");
 const minimizeBtn = document.getElementById("minimize");
-const refreshProjectsBtn = document.getElementById("refresh");
+const cloneProjectBtn = document.getElementById("clone-project");
 const openProjectsFolderBtn = document.getElementById("openFolder");
 const terminalBtn = document.getElementById("terminal");
 const configurationBtn = document.getElementById("configuration");
@@ -27,8 +28,104 @@ minimizeBtn.addEventListener("click", async (event) => {
     await window.electronAPI.minimize();
 });
 
-refreshProjectsBtn.addEventListener("click", async () => {
-    await updateProjects();
+cloneProjectBtn.addEventListener("click", async () => {
+    if (!isGitInstalled) {
+        const modal = new Modal(
+            "Git not installed",
+            `
+                <p>Git is not installed on your system.</p>
+            `,
+            null,
+            false,
+            true,
+        );
+
+        modal.show();
+        return;
+    }
+
+    const modal = new Modal(
+        "Clone project",
+        `
+            <style>
+                .container {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                }
+
+                .warning-message {
+                    padding: 10px;
+                    border-radius: 10px;
+                    background-color: rgba(228, 208, 255, .1);
+                    color: rgba(228, 208, 255, .5);
+                    border: 1px solid rgba(228, 208, 255, .25);
+                    font-size: 14px;
+                }
+
+                .separator {
+                    width: 100%;
+                    height: 1px;
+                    background-color: rgb(45, 45, 50);
+                }
+
+                .switch-container {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 10px;
+                    font-size: 16px;
+                    color: rgba(255, 255, 255, .75);
+                }
+
+                .container:has(#use-repository-name[checked]) #name {
+                    display: none;
+                }
+            </style>
+            <div class="container">
+                <p class="warning-message">Make sure to have access to the repository, otherwise you won't be able to clone it.</p>
+                <ascended-text-input id="url" placeholder="username/repository" label="Repository URL"></ascended-text-input>
+                <div class="separator"></div>
+                <div class="switch-container">
+                    <p>Use repository as project name</p>
+                    <ascended-switch id="use-repository-name" checked></ascended-switch>
+                </div>
+                <div class="separator"></div>
+                <ascended-text-input id="name" placeholder="Project name" label="Project name"></ascended-text-input>
+            </div>
+        `,
+        [
+            "<ascended-button cancel>Cancel</ascended-button>",
+            "<ascended-button action primary primary-color='208, 188, 255'>Clone</ascended-button>",
+        ],
+        null,
+        true,
+    );
+    const modalInput = modal.modalContent.shadowRoot.querySelector("#url");
+    const modalNameInput = modal.modalContent.shadowRoot.querySelector("#name");
+    const useRepositoryNameSwitch = modal.modalContent.shadowRoot.querySelector("#use-repository-name");
+
+    modal.addEventListener(modal.EVENTS.ASK_EXIT.name, async () => {
+        let URL = modalInput.value;
+        if (!URL.startsWith("https://github.com/")) {
+            URL = `https://github.com/${URL}`;
+        }
+
+        const projectName = useRepositoryNameSwitch.checked ? URL.split("/").pop() : modalNameInput.value;
+
+        if (projectName.length === 0) {
+            modal.denyExit();
+            return;
+        }
+
+        await window.electronAPI.cloneProject(URL, projectName);
+
+        modal.authorizeExit();
+        await updateProjects();
+    });
+
+    modal.show();
+    modalInput.focus();
 });
 
 openProjectsFolderBtn.addEventListener("click", () => {
@@ -40,6 +137,8 @@ terminalBtn.addEventListener("click", () => {
 });
 
 configurationBtn.addEventListener("click", async () => {
+    const config = await window.electronAPI.getConfig();
+
     const modal = new Modal(
         "Configuration",
         `
@@ -73,6 +172,7 @@ configurationBtn.addEventListener("click", async () => {
                     justify-content: space-between;
                     gap: 10px;
                     font-size: 16px;
+                    color: rgba(255, 255, 255, .75);
                 }
 
                 #change-projects-folder {
@@ -84,17 +184,17 @@ configurationBtn.addEventListener("click", async () => {
                 <div class="title">General</div>
                 <div class="switch-container">
                     <p>Reduced motion</p>
-                    <ascended-switch id="reduced-motion"></ascended-switch>
+                    <ascended-switch id="reduced-motion" ${config.reducedMotion ? "checked" : ""}></ascended-switch>
                 </div>
                 <div class="separator"></div>
                 <div class="switch-container">
                     <p>Ripples</p>
-                    <ascended-switch id="ripples"></ascended-switch>
+                    <ascended-switch id="ripples" ${config.ripples ? "checked" : ""}></ascended-switch>
                 </div>
                 <div class="separator"></div>
                 <div class="switch-container">
                     <p>Open projects on creation</p>
-                    <ascended-switch id="open-projects-on-creation"></ascended-switch>
+                    <ascended-switch id="open-projects-on-creation" ${config.openProjectsOnCreation ? "checked" : ""}></ascended-switch>
                 </div>
             </div>
             <div class="section">
@@ -112,8 +212,6 @@ configurationBtn.addEventListener("click", async () => {
         true,
     );
 
-    const config = await window.electronAPI.getConfig();
-
     const root = modal.modalContent.shadowRoot;
 
     const reducedMotionSwitch = root.querySelector("#reduced-motion");
@@ -122,9 +220,6 @@ configurationBtn.addEventListener("click", async () => {
     const codeEditorCommandInput = root.querySelector("#code-editor-command");
     const changeProjectsFolderBtn = root.querySelector("#change-projects-folder");
 
-    reducedMotionSwitch.toggle(config.reducedMotion);
-    ripplesSwitch.toggle(config.ripples);
-    openProjectsOnCreationSwitch.toggle(config.openProjectsOnCreation);
     codeEditorCommandInput.setValue(config.codeEditorCommand);
 
     changeProjectsFolderBtn.addEventListener("ascended-button-click", async () => {
@@ -209,6 +304,8 @@ function applyConfig() {
 
 currentConfig = await window.electronAPI.getConfig();
 applyConfig();
+
+isGitInstalled = await window.electronAPI.isGitInstalled();
 
 window.electronAPI.onResetScroll(() => {
     if (projects) {

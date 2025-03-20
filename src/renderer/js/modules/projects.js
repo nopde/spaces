@@ -3,15 +3,30 @@ import { codeProjectFn, openProjectFolderFn, getProjectsFn, openTerminalFn, rena
 
 export const updateProjects = async () => {
     const projects = await getProjectsFn();
+    const currentConfig = await window.electronAPI.getConfig();
+
+    projects.sort((a, b) => {
+        if (currentConfig.favouriteProjects.includes(a) && !currentConfig.favouriteProjects.includes(b)) {
+            return -1;
+        }
+        else if (!currentConfig.favouriteProjects.includes(a) && currentConfig.favouriteProjects.includes(b)) {
+            return 1;
+        }
+        else {
+            return a.localeCompare(b);
+        }
+    });
 
     const projectsContainer = document.querySelector(".projects");
     projectsContainer.innerHTML = "";
 
     projects.forEach(projectName => {
+        const favourite = currentConfig.favouriteProjects.includes(projectName) ? "favourite" : "";
         const spaceHTML = `
             <div class="project" id="${projectName}">
                 <div class="project-title">
                     <p>${projectName}</p>
+                    <div class="favourite-star ${favourite}" id="${projectName} favourite-star"><span class="icons">&#xE735;</span></div>
                     <ascended-button primary primary-color="208, 188, 255" id="${projectName} open">
                         <span class="icons">&#xE8AD;</span>
                         Open
@@ -46,6 +61,7 @@ export const updateProjects = async () => {
         projectsContainer.appendChild(project);
 
         const openBtn = document.getElementById(`${projectName} open`);
+        const favouriteBtn = document.getElementById(`${projectName} favourite-star`);
         const renameBtn = document.getElementById(`${projectName} rename`);
         const deleteBtn = document.getElementById(`${projectName} delete`);
         const openFolderBtn = document.getElementById(`${projectName} openFolder`);
@@ -117,6 +133,25 @@ export const updateProjects = async () => {
 
         openBtn.addEventListener("click", (event) => {
             codeProjectFn(projectName);
+        });
+
+        favouriteBtn.addEventListener("click", async (event) => {
+            const favourite = !favouriteBtn.classList.contains("favourite");
+
+            favouriteBtn.classList.toggle("favourite", favourite);
+
+            const config = await window.electronAPI.getConfig();
+
+            config.favouriteProjects = config.favouriteProjects.filter(project => project !== projectName);
+
+            if (favourite) {
+                config.favouriteProjects.push(projectName);
+            }
+
+            config.favouriteProjects = config.favouriteProjects.sort();
+
+            await window.electronAPI.updateConfig(config);
+            await updateProjects();
         });
     });
 

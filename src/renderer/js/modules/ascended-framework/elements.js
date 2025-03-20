@@ -494,7 +494,7 @@ class Switch extends HTMLElement {
                 }
             </style>
 
-            <div class="container">
+            <div class="container" ${this.checked ? "checked" : ""}>
                 <span class="track">
                     <span class="handle-container">
                         <span class="handle"></span>

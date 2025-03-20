@@ -10,6 +10,7 @@ let mainWindow;
 let tray;
 const gotTheLock = app.requestSingleInstanceLock();
 
+let isGitInstalled = true;
 let projectsFolderWatcher = null;
 
 const iconPath = path.join(app.getAppPath(), "assets/icon.ico");
@@ -24,6 +25,7 @@ const defaultConfig = {
     codeEditorCommand: "code",
     defaultProjectsFolder: path.join(app.getPath("userData"), "Projects"),
     projectsFolder: path.join(app.getPath("userData"), "Projects"),
+    favouriteProjects: [],
 };
 
 let config = defaultConfig;
@@ -84,9 +86,19 @@ const createWindow = () => {
 
 const exec = require("child_process").exec;
 
-function execute(command, callback) {
+function execute(command, callback = null, errorCallback = null) {
     exec(command, (error, stdout, stderr) => {
-        callback(stdout);
+        if (error) {
+            if (errorCallback) {
+                errorCallback(error);
+            }
+            else {
+                console.error(error);
+            }
+        }
+        if (callback) {
+            callback(stdout);
+        }
     });
 }
 
@@ -101,8 +113,12 @@ else {
             config = getConfig();
         }
         else {
-            setConfig(defaultConfig);
+            setConfig(config);
         }
+
+        execute("git --version", null, () => {
+            isGitInstalled = false;
+        });
 
         watchProjectsFolder();
 
@@ -330,6 +346,21 @@ else {
             }
 
             return folderPath.filePaths[0];
+        });
+
+        ipcMain.handle("isGitInstalled", (event) => {
+            return isGitInstalled;
+        });
+
+        ipcMain.handle("cloneProject", async (event, url, projectName) => {
+            try {
+                const folderPath = path.join(config.projectsFolder, projectName);
+                let errorMsg = false;
+                execute(`git clone ${url} ${folderPath}`, null, () => { errorMsg = true; });
+                return errorMsg;
+            } catch (error) {
+                console.error(error.message);
+            }
         });
 
         ipcMain.handle("quit", (event) => {
