@@ -116,7 +116,7 @@ cloneProjectBtn.addEventListener("click", async () => {
     modal.addEventListener(modal.EVENTS.ASK_EXIT.name, async () => {
         let URL = modalInput.value;
         if (!URL.startsWith("https://github.com/")) {
-            if (!URL.startswith("https://")) {
+            if (!URL.startsWith("https://")) {
                 URL = `https://${URL}`;
             }
             else {

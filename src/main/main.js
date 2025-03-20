@@ -75,7 +75,7 @@ const createWindow = () => {
         fullscreenable: false,
         icon: img,
         webPreferences: {
-            devTools: false,
+            // devTools: false,
             zoomFactor: 1.0,
             preload: path.join(app.getAppPath(), "src/preload/preload.js")
         }
