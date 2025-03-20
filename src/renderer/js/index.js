@@ -56,7 +56,7 @@ cloneProjectBtn.addEventListener("click", async () => {
 
                 .warning-message {
                     padding: 10px;
-                    border-radius: 10px;
+                    border-radius: 15px;
                     background-color: rgba(228, 208, 255, .1);
                     color: rgba(228, 208, 255, .5);
                     border: 1px solid rgba(228, 208, 255, .25);
@@ -74,11 +74,19 @@ cloneProjectBtn.addEventListener("click", async () => {
                     align-items: center;
                     justify-content: space-between;
                     gap: 10px;
-                    font-size: 16px;
                     color: rgba(255, 255, 255, .75);
                 }
 
+                .switch-container p {
+                    font-size: 16px;
+                    word-break: break-word;
+                }
+
                 .container:has(#use-repository-name[checked]) #name {
+                    display: none;
+                }
+
+                .container:has(#use-repository-name[checked]) #name-separator {
                     display: none;
                 }
             </style>
@@ -90,7 +98,7 @@ cloneProjectBtn.addEventListener("click", async () => {
                     <p>Use repository as project name</p>
                     <ascended-switch id="use-repository-name" checked></ascended-switch>
                 </div>
-                <div class="separator"></div>
+                <div class="separator" id="name-separator"></div>
                 <ascended-text-input id="name" placeholder="Project name" label="Project name"></ascended-text-input>
             </div>
         `,
@@ -171,8 +179,12 @@ configurationBtn.addEventListener("click", async () => {
                     align-items: center;
                     justify-content: space-between;
                     gap: 10px;
-                    font-size: 16px;
                     color: rgba(255, 255, 255, .75);
+                }
+
+                .switch-container p {
+                    font-size: 16px;
+                    word-break: break-word;
                 }
 
                 #change-projects-folder {
