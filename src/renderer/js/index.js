@@ -116,7 +116,12 @@ cloneProjectBtn.addEventListener("click", async () => {
     modal.addEventListener(modal.EVENTS.ASK_EXIT.name, async () => {
         let URL = modalInput.value;
         if (!URL.startsWith("https://github.com/")) {
-            URL = `https://github.com/${URL}`;
+            if (!URL.startswith("https://")) {
+                URL = `https://${URL}`;
+            }
+            else {
+                URL = `https://github.com/${URL}`;
+            }
         }
 
         const projectName = useRepositoryNameSwitch.checked ? URL.split("/").pop() : modalNameInput.value;
