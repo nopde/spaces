@@ -117,26 +117,27 @@ cloneProjectBtn.addEventListener("click", async () => {
         let URL = modalInput.value;
         const parseURL = (input) => {
             if (!input || typeof input !== "string") return null;
-          
+
             input = input.trim();
-          
+
             input = input.replace(/^https?:\/\//, "").replace(/^www\./, "");
-          
-            if (input.startsWith("github.com/")) {
-              input = input.slice("github.com/".length);
+
+            if (input.startsWith("git@github.com:")) {
+                input = input.slice("git@github.com:".length);
             }
-          
+            if (input.startsWith("github.com/")) {
+                input = input.slice("github.com/".length);
+            }
+
             const parts = input.split("/").filter(Boolean);
             if (parts.length < 2) return null;
-          
+
             const user = parts[0];
             const repo = parts[1].replace(/\.git$/, "");
-          
+
             return `https://github.com/${user}/${repo}`;
         }
         let fixedURL = parseURL(URL);
-
-        console.log(URL, fixedURL);
 
         const projectName = useRepositoryNameSwitch.checked ? fixedURL.split("/").pop() : modalNameInput.value;
 
@@ -304,7 +305,7 @@ configurationBtn.addEventListener("click", async () => {
 
             await window.electronAPI.updateConfig(config);
             await updateProjects();
-            
+
             modal.authorizeExit();
         });
     });
