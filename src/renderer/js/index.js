@@ -115,23 +115,37 @@ cloneProjectBtn.addEventListener("click", async () => {
 
     modal.addEventListener(modal.EVENTS.ASK_EXIT.name, async () => {
         let URL = modalInput.value;
-        if (!URL.startsWith("https://github.com/")) {
-            if (!URL.startsWith("https://")) {
-                URL = `https://${URL}`;
+        const parseURL = (input) => {
+            if (!input || typeof input !== "string") return null;
+          
+            input = input.trim();
+          
+            input = input.replace(/^https?:\/\//, "").replace(/^www\./, "");
+          
+            if (input.startsWith("github.com/")) {
+              input = input.slice("github.com/".length);
             }
-            else {
-                URL = `https://github.com/${URL}`;
-            }
+          
+            const parts = input.split("/").filter(Boolean);
+            if (parts.length < 2) return null;
+          
+            const user = parts[0];
+            const repo = parts[1].replace(/\.git$/, "");
+          
+            return `https://github.com/${user}/${repo}`;
         }
+        let fixedURL = parseURL(URL);
 
-        const projectName = useRepositoryNameSwitch.checked ? URL.split("/").pop() : modalNameInput.value;
+        console.log(URL, fixedURL);
+
+        const projectName = useRepositoryNameSwitch.checked ? fixedURL.split("/").pop() : modalNameInput.value;
 
         if (projectName.length === 0) {
             modal.denyExit();
             return;
         }
 
-        await window.electronAPI.cloneProject(URL, projectName);
+        await window.electronAPI.cloneProject(fixedURL, projectName);
 
         modal.authorizeExit();
         await updateProjects();
