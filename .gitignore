@@ -1,2 +1,30 @@
+# Node.js
 node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Electron build output
 dist/
+out/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Electron builder cache
+build/
+
+# Environment files
+.env
+.env.local
+
+# IDE/editor settings
+.vscode/
+.idea/
+
+# Optional
+*.bak
+*.tmp

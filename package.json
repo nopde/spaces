@@ -7,6 +7,8 @@
     "license": "MIT",
     "main": "src/main/main.js",
     "scripts": {
+        "clean": "rimraf dist",
+        "prebuild": "pnpm run clean",
         "start": "electron .",
         "build": "electron-builder build",
         "test": "echo \"Error: no test specified\" && exit 1"
@@ -14,10 +16,10 @@
     "build": {
         "appId": "spaces",
         "productName": "Spaces",
-        "icon": "icon.ico",
         "forceCodeSigning": false,
         "win": {
             "artifactName": "SpacesSetup.exe",
+            "icon": "assets/icon.ico",
             "target": "nsis-web"
         },
         "nsisWeb": {
@@ -26,11 +28,16 @@
         },
         "directories": {
             "output": "dist"
-        }
+        },
+        "files": [
+            "src",
+            "assets"
+        ]
     },
     "devDependencies": {
         "electron": "^35.0.0",
-        "electron-builder": "^25.1.8"
+        "electron-builder": "^25.1.8",
+        "rimraf": "^6.0.1"
     },
     "dependencies": {
         "chokidar": "^4.0.3",
