@@ -9,17 +9,17 @@ VSCode Project Manager for Windows made in Electron.
 
 ## Installation
 ```
-npm install
+pnpm install
 ```
 
 ## Start
 ```
-npm run start
+pnpm run start
 ```
 
 ## Build
 ```
-npm run build
+pnpm run build
 ```
 
 ## Contributions
