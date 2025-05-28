@@ -20,11 +20,13 @@
         "win": {
             "artifactName": "SpacesSetup.exe",
             "icon": "assets/icon.ico",
-            "target": "nsis-web"
+            "target": "nsis"
         },
-        "nsisWeb": {
+        "nsis": {
             "oneClick": false,
-            "allowToChangeInstallationDirectory": true
+            "allowToChangeInstallationDirectory": true,
+            "createDesktopShortcut": false,
+            "deleteAppDataOnUninstall": false
         },
         "directories": {
             "output": "dist"
