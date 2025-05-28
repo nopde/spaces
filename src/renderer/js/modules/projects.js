@@ -89,6 +89,17 @@ export const updateProjects = async () => {
                 }
     
                 await renameProjectFn(projectName, newProjectName.replace(/ /g, "-"));
+
+                let config = await window.electronAPI.getConfig();
+
+                config.favouriteProjects.forEach(async (project, index) => {
+                    if (project === projectName) {
+                        config.favouriteProjects[index] = newProjectName;
+                        await window.electronAPI.updateConfig(config);
+                        return;
+                    }
+                });
+
                 await updateProjects();
                     
                 modal.authorizeExit();
@@ -115,6 +126,18 @@ export const updateProjects = async () => {
 
             modal.addEventListener(modal.EVENTS.ASK_EXIT.name, async () => {
                 await deleteProjectFn(projectName);
+
+                let config = await window.electronAPI.getConfig();
+
+                config.favouriteProjects.forEach(async (project, index) => {
+                    if (project === projectName) {
+                        config.favouriteProjects.splice(index, 1);
+                        config.favouriteProjects = config.favouriteProjects.sort();
+                        await window.electronAPI.updateConfig(config);
+                        return;
+                    }
+                });
+
                 await updateProjects();
                     
                 modal.authorizeExit();
