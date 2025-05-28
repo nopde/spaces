@@ -3,11 +3,11 @@ export const createProjectsFolderFn = async () => {
 }
 
 export const deleteProjectFn = async (name) => {
-    await window.electronAPI.deleteProject(name);
+    return await window.electronAPI.deleteProject(name);
 }
 
 export const createProjectFn = async (name) => {
-    await window.electronAPI.createProject(name);
+    return await window.electronAPI.createProject(name);
 }
 
 export const openProjectFolderFn = async (name) => {

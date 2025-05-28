@@ -81,13 +81,13 @@ export const updateProjects = async () => {
                 true,
             );
             const modalInput = modal.modalContent.shadowRoot.querySelector("#rename-project-input");
-    
+
             modal.addEventListener(modal.EVENTS.ASK_EXIT.name, async () => {
                 const newProjectName = modalInput.value;
                 if (newProjectName.length === 0 || newProjectName === projectName) {
                     return;
                 }
-    
+
                 await renameProjectFn(projectName, newProjectName.replace(/ /g, "-"));
 
                 let config = await window.electronAPI.getConfig();
@@ -101,7 +101,7 @@ export const updateProjects = async () => {
                 });
 
                 await updateProjects();
-                    
+
                 modal.authorizeExit();
             });
 
@@ -125,7 +125,67 @@ export const updateProjects = async () => {
             );
 
             modal.addEventListener(modal.EVENTS.ASK_EXIT.name, async () => {
-                await deleteProjectFn(projectName);
+                const waitingModal = new Modal(
+                    "Deleting project",
+                    `
+                        <style>
+                            .container {
+                                overflow: hidden;
+                            }
+
+                            .spinner {
+                                margin: auto;
+                                width: 50px;
+                                height: 50px;
+                                border-radius: 50%;
+                                border: 1px solid rgb(75, 75, 75);
+                                border-top-color: rgb(205, 205, 205);
+                                animation: spin 1s linear infinite;
+                            }
+
+                            @keyframes spin {
+                                0% {
+                                    transform: rotate(0deg);
+                                }
+                                100% {
+                                    transform: rotate(360deg);
+                                }
+                            }
+                        </style>
+
+                        <div class="container">
+                            <div class="spinner"></div>
+                        </div>
+                    `,
+                    [],
+                    null,
+                    true,
+                );
+
+                waitingModal.show();
+
+                const error = await deleteProjectFn(projectName);
+
+                waitingModal.authorizeExit();
+
+                if (error) {
+                    modal.authorizeExit();
+
+                    const errorModal = new Modal(
+                        "Error",
+                        `
+                            <p>An error occurred while deleting the project: ${error.message}</p>
+                        `,
+                        [
+                            "<ascended-button primary primary-color='208, 188, 255' cancel>OK</ascended-button>",
+                        ],
+                        false,
+                        true,
+                    );
+
+                    errorModal.show();
+                    return;
+                }
 
                 let config = await window.electronAPI.getConfig();
 
@@ -139,7 +199,7 @@ export const updateProjects = async () => {
                 });
 
                 await updateProjects();
-                    
+
                 modal.authorizeExit();
             });
 
@@ -179,5 +239,5 @@ export const updateProjects = async () => {
     });
 
     const searchBar = document.getElementById("search");
-    searchBar.dispatchEvent(new Event("input"));
+    searchBar._inputEvent();
 }

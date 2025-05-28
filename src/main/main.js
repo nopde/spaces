@@ -263,10 +263,10 @@ else {
                         return output;
                     });
                 }
-                return true;
+                return;
             } catch (error) {
                 console.error(error.message);
-                throw error;
+                return error;
             }
         });
 
@@ -276,10 +276,10 @@ else {
 
                 await deleteRecursiveFolder(folderPath);
 
-                return true;
+                return;
             } catch (error) {
                 console.error(error.message);
-                throw error;
+                return error;
             }
         });
 

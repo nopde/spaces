@@ -331,14 +331,14 @@ class TextInput extends HTMLElement {
             this.value = "";
             this.clearInputElement.classList.add("hidden");
             this.focus();
-            this.textInputElement.dispatchEvent(new Event("input"));
+            this._inputEvent();
         });
     }
 
     setValue(value) {
         this.value = value;
         this.textInputElement.value = value;
-        this.textInputElement.dispatchEvent(new Event("input"));
+        this._inputEvent();
     }
 
     focus() {
@@ -348,6 +348,10 @@ class TextInput extends HTMLElement {
     toggleDisable() {
         this.disabled = !this.disabled;
         this.textInputElement.disabled = this.disabled;
+    }
+
+    _inputEvent() {
+        this.textInputElement.dispatchEvent(new Event("input", { bubbles: true, composed: true }));
     }
 }
 

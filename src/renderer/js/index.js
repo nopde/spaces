@@ -14,7 +14,8 @@ const cloneProjectBtn = document.getElementById("clone-project");
 const openProjectsFolderBtn = document.getElementById("openFolder");
 const terminalBtn = document.getElementById("terminal");
 const configurationBtn = document.getElementById("configuration");
-const searchBar = document.getElementById("search").textInputElement;
+const searchBarContainer = document.getElementById("search");
+const searchBar = searchBarContainer.textInputElement;
 const search = new SearchBar(searchBar);
 const projects = document.querySelector(".projects");
 
@@ -146,7 +147,48 @@ cloneProjectBtn.addEventListener("click", async () => {
             return;
         }
 
+        const waitingModal = new Modal(
+            "Deleting project",
+            `
+                        <style>
+                            .container {
+                                overflow: hidden;
+                            }
+
+                            .spinner {
+                                margin: auto;
+                                width: 50px;
+                                height: 50px;
+                                border-radius: 50%;
+                                border: 1px solid rgb(75, 75, 75);
+                                border-top-color: rgb(205, 205, 205);
+                                animation: spin 1s linear infinite;
+                            }
+
+                            @keyframes spin {
+                                0% {
+                                    transform: rotate(0deg);
+                                }
+                                100% {
+                                    transform: rotate(360deg);
+                                }
+                            }
+                        </style>
+
+                        <div class="container">
+                            <div class="spinner"></div>
+                        </div>
+                    `,
+            [],
+            null,
+            true,
+        );
+
+        waitingModal.show();
+
         await window.electronAPI.cloneProject(fixedURL, projectName);
+
+        waitingModal.authorizeExit();
 
         modal.authorizeExit();
         await updateProjects();
@@ -360,10 +402,28 @@ searchBar.addEventListener("keydown", async (event) => {
     if (event.key === "Enter") {
         event.preventDefault();
         if (searchBar.value) {
-            createProjectFn(searchBar.value);
+            const error = await createProjectFn(searchBar.value);
+
+            if (error) {
+                const errorModal = new Modal(
+                    "Error",
+                    `
+                        <p>An error occurred while creating the project: ${error.message}</p>
+                    `,
+                    [
+                        "<ascended-button primary primary-color='208, 188, 255' cancel>OK</ascended-button>",
+                    ],
+                    false,
+                    true,
+                );
+
+                errorModal.show();
+                return;
+            }
+
             await updateProjects();
+            
             searchBar.focus();
-            searchBar.dispatchEvent(new Event("input"));
         }
     }
 });
