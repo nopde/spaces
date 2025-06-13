@@ -19,7 +19,6 @@ const img = nativeImage.createFromPath(iconPath);
 const configPath = path.join(app.getPath("userData"), "config.json");
 
 const defaultConfig = {
-    reducedMotion: false,
     ripples: true,
     openProjectsOnCreation: false,
     codeEditorCommand: "code",
@@ -63,6 +62,28 @@ function watchProjectsFolder() {
     projectsFolderWatcher.on("unlinkDir", () => {
         mainWindow.webContents.send("refresh-projects");
     });
+}
+
+function normalizeProjectName(name) {
+    const blacklistedRegex = /[\\\/:*?"<>|]/g;
+    const reservedNames = new Set([
+        "con", "prn", "aux", "nul",
+        "com1", "com2", "com3", "com4", "com5", "com6", "com7", "com8", "com9",
+        "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9"
+    ]);
+
+    let normalized = name
+        .trim()
+        .toLowerCase()
+        .replace(blacklistedRegex, "")
+        .replace(/\s+/g, "-")
+        .replace(/^[-]+|[-]+$/g, "");
+
+    if (reservedNames.has(normalized) || normalized === "") {
+        normalized = `${normalized}-${Date.now()}`;
+    }
+
+    return normalized;
 }
 
 const createWindow = () => {
@@ -256,7 +277,8 @@ else {
 
         ipcMain.handle("createProject", async (event, name) => {
             try {
-                const folderPath = path.join(config.projectsFolder, name.replace(/ /g, "-"));
+                const projectName = normalizeProjectName(name);
+                const folderPath = path.join(config.projectsFolder, projectName);
                 await fs_promises.mkdir(folderPath);
                 if (config.openProjectsOnCreation) {
                     execute(`${config.codeEditorCommand} ${folderPath}`, (output) => {
@@ -301,7 +323,8 @@ else {
         }
 
         ipcMain.handle("codeProject", async (event, name) => {
-            const folderPath = path.join(config.projectsFolder, name.replace(/ /g, "-"));
+            const projectName = normalizeProjectName(name);
+            const folderPath = path.join(config.projectsFolder, projectName);
             execute(`${config.codeEditorCommand} ${folderPath}`, (output) => {
                 return output;
             });

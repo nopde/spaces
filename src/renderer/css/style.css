@@ -30,6 +30,28 @@ body {
     overflow: hidden;
 }
 
+::-webkit-scrollbar {
+    border-radius: 999px;
+    width: 15px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgb(255, 255, 255);
+    background-clip: content-box;
+    border: 5px solid #0000;
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, .75);
+    border: 4px solid #0000;
+}
+
+::-webkit-scrollbar-thumb:active {
+    background-color: rgba(255, 255, 255, .5);
+    border: 3px solid #0000;
+}
+
 .wrapper {
     display: flex;
     flex-direction: column;
@@ -123,7 +145,7 @@ body {
     color: white;
 }
 
-.titlebar button:active {
+.titlebar button:hover:active {
     background-color: rgba(255, 255, 255, .15);
     color: white;
 }
@@ -132,7 +154,7 @@ body {
     background-color: rgb(255, 0, 0);
 }
 
-.titlebar button[red]:active {
+.titlebar button[red]:hover:active {
     background-color: rgb(150, 0, 0);
 }
 
@@ -149,26 +171,14 @@ body {
     display: flex;
     align-items: center;
     gap: 5px;
-    border-top: 1px solid rgb(45, 45, 50);
+    font-size: 14px;
 }
 
 .search ascended-text-input {
     flex: 1 1;
 }
 
-.search-buttons {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 14px;
-    padding: 10px;
-}
-
-.search-buttons ascended-button {
-    width: 100%;
-}
-
-.search-buttons #configuration {
+.search ascended-button {
     width: max-content;
     height: 100%;
 }
@@ -178,49 +188,27 @@ body {
     display: flex;
     flex-direction: column;
     overflow: auto;
-    padding: 15px;
-    padding-bottom: 30px;
-    padding-left: 30px;
+    padding-block: 10px;
+    padding-left: 20px;
+    padding-right: 5px;
     scrollbar-gutter: stable;
     background-color: rgb(10, 10, 15);
 }
 
-::-webkit-scrollbar {
-    border-radius: 999px;
-    width: 15px;
-}
-
-::-webkit-scrollbar-thumb {
-    background-color: rgb(255, 255, 255);
-    background-clip: content-box;
-    border: 5px solid #0000;
-    border-radius: 999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(255, 255, 255, .75);
-    border: 4px solid #0000;
-}
-
-::-webkit-scrollbar-thumb:active {
-    background-color: rgba(255, 255, 255, .5);
-    border: 3px solid #0000;
-}
-
 .project {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    gap: 10px;
     border-radius: 20px;
-    background-color: rgb(25, 25, 30);
+    background-color: rgb(20, 20, 25);
     margin-bottom: 10px;
-    min-height: 115px;
-    height: 115px;
+    min-height: 60px;
+    height: 60px;
     overflow: hidden;
+    font-size: 14px;
+    padding-left: 15px;
+    padding-right: 10px;
     transition: all 150ms ease;
-}
-
-body[reduced-motion] .project {
-    transition-duration: 0ms;
 }
 
 .project:last-child {
@@ -234,25 +222,17 @@ body[reduced-motion] .project {
     height: 0;
 }
 
-.project .project-title {
-    font-size: 14px;
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background-color: rgb(20, 20, 25);
-}
-
-.project .project-title p {
+.project p {
     font-size: 18px;
-    margin-left: 10px;
     margin-right: auto;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    color: rgb(185, 185, 185);
 }
 
 .project .favourite-star {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -263,20 +243,16 @@ body[reduced-motion] .project {
     background-color: transparent;
     outline: none;
     cursor: pointer;
-    transition: all 150ms cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-body[reduced-motion] .project .favourite-star {
-    transition-duration: 0ms;
+    transition: all 75ms linear;
 }
 
 .project .favourite-star:hover,
-.project .favourite-star:active {
+.project .favourite-star:hover:active {
     color: rgba(228, 208, 255, .75);
     background-color: rgba(255, 255, 255, .1);
 }
 
-.project .favourite-star:active {
+body:not([ripples]) .project .favourite-star:hover:active {
     filter: brightness(0.75);
 }
 
@@ -284,11 +260,6 @@ body[reduced-motion] .project .favourite-star {
     color: rgb(228, 208, 255);
 }
 
-.project .project-buttons {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    font-size: 14px;
-    padding: 10px;
+.project ascended-button {
+    height: 40px;
 }

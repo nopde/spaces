@@ -27,7 +27,8 @@ class Modal extends HTMLElement {
                     left: 0;
                     width: 100%;
                     height: 100%;
-                    background-color: rgba(0, 0, 0, .75);
+                    background-color: rgba(0, 0, 0, .5);
+                    backdrop-filter: blur(5px);
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -37,7 +38,6 @@ class Modal extends HTMLElement {
 
                 .modal {
                     background-color: rgb(30, 30, 35);
-                    box-shadow: 0 5px 25px rgba(0, 0, 0, .75);
                     border-radius: 25px;
                     padding: 20px;
                     min-width: 350px;

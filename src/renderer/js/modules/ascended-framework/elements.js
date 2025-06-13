@@ -1,85 +1,15 @@
 import { globalStyles, RippleHandler } from "./utils.js";
 
-class Container extends HTMLElement {
-    constructor() {
-        super();
-
-        this.content = this.innerHTML;
-        this.innerHTML = "";
-
-        this.alignItems = this.hasAttribute("align-items") ? this.getAttribute("align-items") : "normal";
-        this.justifyContent = this.hasAttribute("justify-content") ? this.getAttribute("justify-content") : "normal";
-        this.direction = this.hasAttribute("direction") ? this.getAttribute("direction") : "row";
-        this.gap = this.hasAttribute("gap") ? this.getAttribute("gap") : "0px";
-        this.wrap = this.hasAttribute("wrap") ? this.getAttribute("wrap") : "no-wrap";
-
-        this.fontSize = this.hasAttribute("font-size") ? this.getAttribute("font-size") : "inherit";
-        this.fontWeight = this.hasAttribute("font-weight") ? this.getAttribute("font-weight") : "inherit";
-
-        this.shadow = this.attachShadow({ mode: "open" });
-    }
-
-    connectedCallback() {
-        this.shadow.innerHTML = `
-            <style>
-                ${globalStyles}
-
-                :host {
-                    --font-size: ${this.fontSize};
-                    --font-weight: ${this.fontWeight};
-
-                    --align-items: ${this.alignItems};
-                    --justify-content: ${this.justifyContent};
-                    --direction: ${this.direction};
-                    --gap: ${this.gap};
-                    --wrap: ${this.wrap};
-
-                    width: max-content;
-                    height: max-content;
-                    font-size: var(--font-size);
-                    font-weight: var(--font-weight);
-
-                    color: inherit;
-
-                    display: flex;
-                    flex-direction: var(--direction);
-                    align-items: var(--align-items);
-                    justify-content: var(--justify-content);
-                    gap: var(--gap);
-                    flex-wrap: var(--wrap);
-                }
-            </style>
-
-            ${this.content}
-        `;
-    }
-
-    setDirection(direction) {
-        this.direction = direction;
-        this.style.setProperty("--direction", this.direction);
-    }
-
-    setGap(gap) {
-        this.gap = gap;
-        this.style.setProperty("--gap", this.gap);
-    }
-
-    setWrap(wrap) {
-        this.wrap = wrap;
-        this.style.setProperty("--wrap", this.wrap);
-    }
-}
-
 class Button extends HTMLElement {
     constructor() {
         super();
 
         this.content = this.innerHTML;
-        this.primary = this.hasAttribute("primary");
+        this.accent = this.hasAttribute("accent");
         this.disabled = this.hasAttribute("disabled");
 
         this.elevated = this.hasAttribute("elevated");
-        this.primaryColor = this.hasAttribute("primary-color") ? this.getAttribute("primary-color") : "255, 255, 255";
+        this.accentColor = this.hasAttribute("accent-color") ? this.getAttribute("accent-color") : "255, 255, 255";
 
         this.innerHTML = "";
 
@@ -116,25 +46,29 @@ class Button extends HTMLElement {
                     justify-content: center;
                     gap: 5px;
                     white-space: nowrap;
-                    transition: all 67ms linear;
+                    transition:
+                        background-color 67ms linear,
+                        color 67ms linear,
+                        filter 67ms linear;
                 }
 
                 .button:hover,
-                .button:active {
+                .button:hover:active {
                     background-color: rgba(255, 255, 255, .2);
                 }
 
-                .button.primary {
-                    background-color: rgb(${this.primaryColor});
+                .button.accent {
+                    background-color: rgb(${this.accentColor});
                     color: rgb(30, 30, 30);
                 }
 
-                .button.primary:hover,
-                .button.primary:active {
+                .button.accent:hover,
+                .button.accent:hover:active {
+                    background-color: rgb(${this.accentColor});
                     filter: brightness(0.85);
                 }
 
-                :host:host-context(body:not([ripples])) .button:active {
+                :host:host-context(body:not([ripples])) .button:hover:active {
                     filter: brightness(0.75);
                 }
 
@@ -152,7 +86,7 @@ class Button extends HTMLElement {
                 }
             </style>
 
-            <button class="button ${this.primary ? "primary" : ""}" ${this.disabled ? "disabled" : ""} ${this.elevated ? "elevated" : ""}>${this.content}</button>
+            <button class="button ${this.accent ? "accent" : ""}" ${this.disabled ? "disabled" : ""} ${this.elevated ? "elevated" : ""}>${this.content}</button>
         `;
 
         this.EVENTS = {
@@ -166,7 +100,7 @@ class Button extends HTMLElement {
 
         this.setupEventListeners();
 
-        const rippleColor = this.primary ? "0, 0, 0" : "255, 255, 255";
+        const rippleColor = this.accent ? "0, 0, 0" : "255, 255, 255";
         new RippleHandler(this.buttonElement, rippleColor, .16, true);
     }
 
@@ -249,6 +183,10 @@ class TextInput extends HTMLElement {
                     background-color: rgba(255, 255, 255, .2);
                 }
 
+                .text-input-container:has(.clear-input:hover) .text-input {
+                    background-color: rgba(255, 255, 255, .1);
+                }
+
                 .text-input[disabled] {
                     opacity: .5;
                     pointer-events: none;
@@ -259,7 +197,10 @@ class TextInput extends HTMLElement {
                 }
 
                 .clear-input {
+                    --scale: 0;
                     position: absolute;
+                    top: 50%;
+                    right: 5px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -268,22 +209,25 @@ class TextInput extends HTMLElement {
                     background-color: rgb(255, 255, 255, .1);
                     color: rgba(255, 255, 255, .5);
                     border-radius: 9999px;
-                    transition: all 250ms ease, background-color 67ms linear;
+                    translate: 0 -50%;
+                    transition:
+                        all 250ms cubic-bezier(.175, .885, .32, 1.275),
+                        background-color 67ms linear;
                 }
 
-                :host:host-context(body[reduced-motion]) .clear-input {
-                    transition-duration: 0ms;
-                }
-
-                .clear-input:hover,
-                .clear-input:active {
+                .clear-input:hover {
                     background-color: rgba(255, 255, 255, .2);
                     color: rgba(255, 255, 255, .8);
+                    scale: var(--scale);
+                }
+
+                .clear-input:hover:active {
+                    background-color: rgba(255, 255, 255, .3);
                 }
 
                 .clear-input.hidden {
                     opacity: 0;
-                    transform: translateX(50px) scale(.5);
+                    transform: translateX(20px) scale(0);
                 }
             </style>
 
@@ -303,14 +247,14 @@ class TextInput extends HTMLElement {
     connectedCallback() {
         this.value = this.textInputElement.value;
 
-        const textInputRect = this.textInputElement.getBoundingClientRect();
-        const clearInputSize = 25;
-        const clearInputOffset = Math.round(Math.round(textInputRect.height) / 2 - clearInputSize / 2);
+        const textInputHeight = this.textInputElement.getBoundingClientRect().height;
+        const clearInputSize = Math.round(textInputHeight) - 10;
+        const scale = textInputHeight / clearInputSize;
 
         this.clearInputElement.style.width = `${clearInputSize}px`;
         this.clearInputElement.style.height = `${clearInputSize}px`;
-        this.clearInputElement.style.right = `${clearInputOffset}px`;
-        this.clearInputElement.style.top = `${clearInputOffset}px`;
+
+        this.clearInputElement.style.setProperty("--scale", scale);
     }
 
     setupEventListeners() {
@@ -361,6 +305,8 @@ class Switch extends HTMLElement {
 
         this.checked = this.hasAttribute("checked");
         this.disabled = this.hasAttribute("disabled");
+
+        this.accentColor = this.hasAttribute("accent-color") ? this.getAttribute("accent-color") : "255, 255, 255";
 
         const shadow = this.attachShadow({ mode: "open" });
 
@@ -417,14 +363,14 @@ class Switch extends HTMLElement {
                     transition-timing-function: linear;
                     transition-duration: 67ms;
                     background-color: transparent;
-                    border-color: rgba(255, 255, 255, .75);
+                    border-color: rgba(${this.accentColor}, .75);
                     border-style: solid;
                     border-width: 2px;
                 }
 
                 .container[checked] .track::before {
-                    background-color: rgb(255, 255, 255);
-                    border-color: rgb(255, 255, 255);
+                    background-color: rgb(${this.accentColor});
+                    border-color: rgb(${this.accentColor});
                 }
 
                 .handle-container {
@@ -434,10 +380,6 @@ class Switch extends HTMLElement {
                     position relative;
                     transition: margin 300ms cubic-bezier(.175, .885, .32, 1.275);
                     margin-inline-end: 20px;
-                }
-
-                :host:host-context(body[reduced-motion]) .handle-container {
-                    transition-duration: 67ms;
                 }
 
                 .container[checked] .handle-container {
@@ -459,10 +401,6 @@ class Switch extends HTMLElement {
                     z-index: 0;
                 }
 
-                :host:host-context(body[reduced-motion]) .handle {
-                    transition-duration: 67ms;
-                }
-
                 .container[checked] .handle {
                     width: 24px;
                     height: 24px;
@@ -481,12 +419,12 @@ class Switch extends HTMLElement {
                     border-radius: inherit;
                     box-sizing: border-box;
                     transition: background-color 67ms linear;
-                    background-color: rgba(255, 255, 255, .75);
+                    background-color: rgba(${this.accentColor}, .75);
                 }
 
                 .container:hover .handle::before,
                 .container:active .handle::before {
-                    background-color: white;
+                    background-color: rgb(${this.accentColor});
                 }
                 
                 .container[checked] .handle::before {
@@ -523,11 +461,7 @@ class Switch extends HTMLElement {
 
         this.addEventListener("click", () => {
             this.dispatchEvent(this.EVENTS.BEFORE_TOGGLE.event);
-
-            if (!this.toggle()) {
-                return;
-            }
-
+            this._toggle(!this.checked);
             this.dispatchEvent(this.EVENTS.TOGGLE.event);
         });
     }
@@ -580,15 +514,17 @@ class Slider extends HTMLElement {
         this.value = this.hasAttribute("value") ? parseFloat(this.getAttribute("value")) : this.min;
         this.disabled = this.hasAttribute("disabled");
         this.useFloat = this.hasAttribute("float");
-        
+
         this.value = Math.max(this.min, Math.min(this.max, this.value));
         this.suffix = this.hasAttribute("suffix") ? this.getAttribute("suffix") : "";
 
         this.hasSteps = this.hasAttribute("step");
         this.step = this.hasSteps ? parseFloat(this.getAttribute("step")) : 1;
-        
+
         this.value = this.formatValue(this.value);
-        
+
+        this.accentColor = this.hasAttribute("accent-color") ? this.getAttribute("accent-color") : "255, 255, 255";
+
         const shadow = this.attachShadow({ mode: "open" });
 
         shadow.innerHTML = `
@@ -605,14 +541,13 @@ class Slider extends HTMLElement {
                 .container {
                     display: flex;
                     flex-direction: column;
-                    padding-inline: 10px;
+                    gap: 5px;
                 }
 
                 .header {
                     display: flex;
                     align-items: center;
                     justify-content: right;
-                    padding-inline: 5px;
                 }
 
                 .label {
@@ -642,80 +577,57 @@ class Slider extends HTMLElement {
                 
                 .track {
                     position: relative;
+                    display: flex;
                     width: 100%;
-                    height: 4px;
-                    background-color: rgba(255, 255, 255, .1);
+                    height: 12px;
                     border-radius: 9999px;
-                    overflow: visible;
+                }
+
+                .fake-track {
+                    position: absolute;
+                    right: 0;
+                    z-index: 1;
+                    width: 100%;
+                    height: 100%;
+                    border-radius: 15px;
+                    background-color: rgba(${this.accentColor}, .08);
+                    overflow: hidden;
                     transition: background-color 67ms linear;
                 }
-                
-                .slider-container:hover .track {
-                    background-color: rgba(255, 255, 255, .2);
+
+                .slider-container:hover .fake-track {
+                    background-color: rgba(${this.accentColor}, .12);
                 }
                 
                 .filled-track {
                     position: absolute;
+                    z-index: 1;
                     height: 100%;
-                    background-color: rgb(205, 205, 205);
-                    border-radius: 9999px;
-                    transition: background-color 67ms linear;
-                }
-                
-                :host:host-context(body[reduced-motion]) .filled-track {
-                    transition-duration: 67ms;
-                }
-                
-                .slider-container:hover .filled-track {
-                    background-color: rgb(255, 255, 255);
-                }
-
-                .slider-container:active .filled-track {
-                    background-color: rgb(255, 255, 255);
+                    background-color: rgb(${this.accentColor}, 255);
+                    border-radius: 15px;
                 }
                 
                 .handle {
                     position: absolute;
                     top: 50%;
-                    height: 16px;
-                    width: 16px;
+                    height: 32px;
+                    width: 4px;
                     border-radius: 9999px;
-                    background-color: rgb(205, 205, 205);
+                    background-color: rgba(${this.accentColor}, .85);
                     transform: translate(-50%, -50%);
                     transform-origin: center center;
-                    transition: transform 250ms cubic-bezier(.2, 0, 0, 1), background-color 67ms linear;
-                    z-index: 1;
-                }
-                
-                :host:host-context(body[reduced-motion]) .handle {
-                    transition-duration: 67ms;
+                    transition: width 250ms cubic-bezier(.175, .885, .32, 1.275), background-color 67ms linear;
+                    z-index: 2;
                 }
                 
                 .slider-container:hover .handle {
-                    background-color: rgb(255, 255, 255);
+                    background-color: rgb(${this.accentColor});
+                    width: 6px;
                 }
                 
                 .slider-container:active .handle {
-                    background-color: rgb(255, 255, 255);
-                    transform: translate(-50%, -50%) scale(1.25);
-                }
-                
-                .steps-container {
-                    position: absolute;
-                    top: 50%;
-                    width: 100%;
-                    height: 4px;
-                    transform: translateY(-50%);
-                    pointer-events: none;
-                }
-                
-                .step-mark {
-                    position: absolute;
-                    width: 4px;
-                    height: 4px;
-                    background-color: rgba(255, 255, 255, .5);
-                    border-radius: 50%;
-                    transform: translate(-50%, 0);
+                    background-color: rgb(${this.accentColor});
+                    width: 2px;
                 }
             </style>
 
@@ -727,8 +639,8 @@ class Slider extends HTMLElement {
                 <div class="slider-container" ${this.disabled ? "disabled" : ""}>
                     <div class="track">
                         <div class="filled-track"></div>
+                        <div class="fake-track"></div>
                         <div class="handle"></div>
-                        ${this.hasSteps ? `<div class="steps-container"></div>` : ""}
                     </div>
                 </div>
             </div>
@@ -737,16 +649,16 @@ class Slider extends HTMLElement {
         this.EVENTS = {
             CHANGE: {
                 name: "ascended-slider-change",
-                event: new CustomEvent("ascended-slider-change", { 
-                    bubbles: true, 
+                event: new CustomEvent("ascended-slider-change", {
+                    bubbles: true,
                     composed: true,
                     detail: { value: this.value }
                 }),
             },
             INPUT: {
                 name: "ascended-slider-input",
-                event: new CustomEvent("ascended-slider-input", { 
-                    bubbles: true, 
+                event: new CustomEvent("ascended-slider-input", {
+                    bubbles: true,
                     composed: true,
                     detail: { value: this.value }
                 }),
@@ -755,20 +667,16 @@ class Slider extends HTMLElement {
 
         this.sliderContainer = shadow.querySelector(".slider-container");
         this.track = shadow.querySelector(".track");
+        this.fakeTrack = shadow.querySelector(".fake-track");
         this.filledTrack = shadow.querySelector(".filled-track");
         this.handle = shadow.querySelector(".handle");
         this.valueDisplay = shadow.querySelector(".value-display");
-        this.stepsContainer = shadow.querySelector(".steps-container");
+
+        this.trackWidth = this.track.getBoundingClientRect().width;
+        this.handleWidth = this.handle.getBoundingClientRect().width;
 
         this.setupEventListeners();
-    }
-
-    connectedCallback() {
-        this.updateSliderPosition();
-
-        if (this.hasSteps) {
-            this.renderStepMarks();
-        }
+        this.updateSliderPosition(false);
     }
 
     formatValue(val) {
@@ -793,7 +701,7 @@ class Slider extends HTMLElement {
             if (!isDragging) return;
             isDragging = false;
             this.sliderContainer.classList.remove("active");
-            
+
             this.dispatchChangeEvent();
         };
 
@@ -807,19 +715,42 @@ class Slider extends HTMLElement {
             const rect = this.track.getBoundingClientRect();
             let percentage = (e.clientX - rect.left) / rect.width;
             percentage = Math.max(0, Math.min(1, percentage));
-            
+
             this.setValueFromPercentage(percentage);
             this.updateSliderPosition();
-            
+
             this.dispatchInputEvent();
         };
 
         this.sliderContainer.addEventListener("mousedown", startDrag);
         this.sliderContainer.addEventListener("touchstart", (e) => startDrag(e.touches[0]));
-        
+
+        this.sliderContainer.addEventListener("mousedown", () => {
+            this.handle.classList.add("active");
+            this.updateSliderPosition();
+        });
+
+        window.addEventListener("mouseup", () => {
+            if (!this.handle.classList.contains("active")) {
+                return;
+            }
+
+            this.handle.classList.remove("active");
+            this.updateSliderPosition();
+        });
+
+        window.addEventListener("mousecancel", () => {
+            if (!this.handle.classList.contains("active")) {
+                return;
+            }
+
+            this.handle.classList.remove("active");
+            this.updateSliderPosition();
+        });
+
         window.addEventListener("mousemove", drag);
         window.addEventListener("touchmove", (e) => drag(e.touches[0]));
-        
+
         window.addEventListener("mouseup", stopDrag);
         window.addEventListener("touchend", stopDrag);
         window.addEventListener("touchcancel", stopDrag);
@@ -829,15 +760,15 @@ class Slider extends HTMLElement {
 
     setValueFromPercentage(percentage) {
         let rawValue = this.min + percentage * (this.max - this.min);
-        
+
         if (this.hasSteps) {
             rawValue = Math.round(rawValue / this.step) * this.step;
         }
-        
+
         rawValue = this.formatValue(rawValue);
-        
+
         this.value = Math.max(this.min, Math.min(this.max, rawValue));
-        
+
         this.updateDisplayedValue();
     }
 
@@ -847,27 +778,52 @@ class Slider extends HTMLElement {
         }
     }
 
-    updateSliderPosition() {
+    updateSliderPosition(animations = true) {
         const percentage = (this.value - this.min) / (this.max - this.min);
-        
-        this.filledTrack.style.width = `${percentage * 100}%`;
-        this.handle.style.left = `${percentage * 100}%`;
-    }
+        const handlePosition = this.trackWidth * percentage;
+        const gap = this.handle.classList.contains("active") ? "7px" : "10px";
 
-    renderStepMarks() {
-        this.stepsContainer.innerHTML = "";
-        
-        const totalSteps = Math.floor((this.max - this.min) / this.step) + 1;
-        
-        for (let i = 1; i < totalSteps - 1; i++) {
-            const stepMark = document.createElement("div");
-            stepMark.classList.add("step-mark");
-            
-            const percentage = (i * this.step) / (this.max - this.min);
-            stepMark.style.left = `${percentage * 100}%`;
-            
-            this.stepsContainer.appendChild(stepMark);
+        if (!animations) {
+            this.filledTrack.style.width = `calc(${percentage * 100}% - ${gap})`;
+            this.fakeTrack.style.width = `calc(${(1 - percentage) * 100}% - ${gap})`;
+            this.handle.style.translate = `${handlePosition}px 0px`;
+            return;
         }
+
+        const bounceEasing = "cubic-bezier(.175, .885, .32, 1.275)";
+        const animationDuration = 500;
+
+        const filledTrackAnimation = this.filledTrack.animate([
+            { width: `calc(${percentage * 100}% - ${gap})` }
+        ], {
+            duration: animationDuration,
+            easing: bounceEasing,
+            fill: "forwards",
+        });
+
+        const fakeTrackAnimation = this.fakeTrack.animate([
+            { width: `calc(${(1 - percentage) * 100}% - ${gap})` },
+        ], {
+            duration: animationDuration,
+            easing: bounceEasing,
+            fill: "forwards",
+        });
+
+        const handleAnimation = this.handle.animate([
+            { translate: `${handlePosition}px 0px` }
+        ], {
+            duration: animationDuration,
+            easing: bounceEasing,
+            fill: "forwards",
+        });
+
+        const animationsFinished = Promise.all([
+            filledTrackAnimation.finished,
+            fakeTrackAnimation.finished,
+            handleAnimation.finished,
+        ]);
+
+        return animationsFinished;
     }
 
     dispatchChangeEvent() {
@@ -890,17 +846,17 @@ class Slider extends HTMLElement {
 
     setValue(value) {
         let newValue = parseFloat(value);
-        
+
         newValue = this.formatValue(newValue);
-        
+
         newValue = Math.max(this.min, Math.min(this.max, newValue));
-        
+
         if (this.value !== newValue) {
             this.value = newValue;
-            
+
             this.updateDisplayedValue();
             this.updateSliderPosition();
-            
+
             this.dispatchChangeEvent();
         }
     }
@@ -912,9 +868,9 @@ class Slider extends HTMLElement {
 
     toggleFloat(useFloat) {
         this.useFloat = useFloat !== undefined ? useFloat : !this.useFloat;
-        
+
         this.value = this.formatValue(this.value);
-        
+
         this.updateDisplayedValue();
     }
 
@@ -928,10 +884,6 @@ class Slider extends HTMLElement {
             this.setValue(this.min);
         }
         this.updateSliderPosition();
-        
-        if (this.hasSteps) {
-            this.renderStepMarks();
-        }
     }
 
     setMax(max) {
@@ -940,25 +892,166 @@ class Slider extends HTMLElement {
             this.setValue(this.max);
         }
         this.updateSliderPosition();
-        
-        if (this.hasSteps) {
-            this.renderStepMarks();
-        }
     }
 
     setStep(step) {
         this.step = parseFloat(step);
         this.hasSteps = true;
-        this.renderStepMarks();
-        
+
         const percentage = (this.value - this.min) / (this.max - this.min);
         this.setValueFromPercentage(percentage);
         this.updateSliderPosition();
     }
 }
 
-customElements.define("ascended-container", Container);
+class SelectableList extends HTMLElement {
+    constructor() {
+        super();
+
+        this.items = this.hasAttribute("items") ? this.getAttribute("items").split(",") : [];
+        this.selectedItem = this.hasAttribute("selected") ? this.getAttribute("selected") : this.items[0];
+
+        const shadow = this.attachShadow({ mode: "open" });
+
+        shadow.innerHTML = `
+            <style>
+                ${globalStyles}
+
+                :host {
+                    font-size: inherit;
+                    font-weight: inherit;
+                    border: 1px solid rgba(255, 255, 255, .1);
+                    border-radius: 10px;
+                    overflow-y: auto;
+                }
+
+                :host::-webkit-scrollbar {
+                    display: none;
+                }
+
+                .container {
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .selectable-item {
+                    padding: 0 20px;
+                    cursor: pointer;
+                    color: rgba(255, 255, 255, .75);
+                    overflow: hidden;
+                    height: 40px;
+                    display: flex;
+                    align-items: center;
+                    border-radius: 9999px;
+                    background-color: rgba(255, 255, 255, .05);
+                    margin-bottom: 5px;
+                    transition: all 67ms linear;
+                }
+
+                .selectable-item span {
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    pointer-events: none;
+                }
+
+                .selectable-items-container {
+                    display: flex;
+                    flex-direction: column;
+                    padding: 10px;
+                }
+
+                .selectable-item:last-child {
+                    border-bottom: none;
+                    margin-bottom: 0;
+                }
+
+                .selectable-item:hover,
+                .selectable-item:active {
+                    background-color: rgba(255, 255, 255, .1);
+                    color: rgb(255, 255, 255);
+                }
+
+                .selectable-item[selected] {
+                    background-color: rgb(208, 188, 255);
+                    color: rgb(30, 30, 30);
+                    box-shadow: 0 2px 5px rgb(0, 0, 0, .25);
+                }
+
+                .search-container {
+                    position: sticky;
+                    z-index: 5;
+                    top: 0;
+                    padding: 10px;
+                    background-color: rgb(30, 30, 35);
+                    border-bottom: 1px solid rgba(255, 255, 255, .1);
+                }
+            </style>
+
+            <div class="container">
+                <div class="search-container">
+                    <ascended-text-input placeholder="Search..."></ascended-text-input>
+                </div>
+                <div class="selectable-items-container">
+                    ${this.items.map((item, index) => `
+                        <div class="selectable-item" ${this.selectedItem === item ? "selected" : ""}><span>${item}</span></div>
+                    `).join("")}
+                </div>
+            </div>
+        `;
+
+        this.itemsContainer = shadow.querySelector(".selectable-items-container");
+        this.selectedItem = shadow.querySelector(`.selectable-item[selected]`);
+        this.searchInput = shadow.querySelector("ascended-text-input");
+
+        this.containerElement = shadow.querySelector(".container");
+
+        this.setupEventListeners();
+    }
+
+    focusSearch() {
+        this.searchInput.focus();
+    }
+
+    _filterItems() {
+        const searchText = this.searchInput.textInputElement.value.trim().toLowerCase();
+        const selectedItemText = this.selectedItem.textContent.trim().toLowerCase();
+        const searchWords = searchText.split(" ").filter(word => word !== "");
+
+        this.itemsContainer.innerHTML = "";
+
+        this.items.forEach((item) => {
+            const itemText = item.toLowerCase();
+            let match = true;
+
+            searchWords.forEach(word => {
+                if (!itemText.includes(word)) {
+                    match = false;
+                }
+            });
+
+            if (match) {
+                this.itemsContainer.innerHTML += `<div class="selectable-item" ${selectedItemText === itemText ? "selected" : ""}><span>${item}</span></div>`;
+            }
+        });
+    }
+
+    setupEventListeners() {
+        this.containerElement.addEventListener("click", (e) => {
+            const target = e.target;
+            if (target.classList.contains("selectable-item")) {
+                this.selectedItem.toggleAttribute("selected", false);
+                this.selectedItem = target;
+                this.selectedItem.toggleAttribute("selected", true);
+            }
+        });
+
+        this.searchInput.textInputElement.addEventListener("input", () => this._filterItems());
+    }
+}
+
 customElements.define("ascended-button", Button);
 customElements.define("ascended-text-input", TextInput);
 customElements.define("ascended-switch", Switch);
 customElements.define("ascended-slider", Slider);
+customElements.define("ascended-selectable-list", SelectableList);

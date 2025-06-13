@@ -2,6 +2,7 @@ import { SearchBar } from "./modules/searchbar.js";
 import { createProjectsFolderFn, createProjectFn, openProjectsFolderFn, openTerminalFn } from "./modules/preload_functions.js";
 import { updateProjects } from "./modules/projects.js";
 import { Modal } from "./modules/ascended-framework/modal.js";
+import { Menu, MenuItem } from "./modules/menu.js";
 
 // Variables
 
@@ -10,13 +11,13 @@ let isGitInstalled = null;
 
 const quitBtn = document.getElementById("quit");
 const minimizeBtn = document.getElementById("minimize");
-const cloneProjectBtn = document.getElementById("clone-project");
-const openProjectsFolderBtn = document.getElementById("openFolder");
-const terminalBtn = document.getElementById("terminal");
+const moreOptionsBtn = document.getElementById("more-options");
+const gitOptionsBtn = document.getElementById("git-options");
 const configurationBtn = document.getElementById("configuration");
 const searchBarContainer = document.getElementById("search");
 const searchBar = searchBarContainer.textInputElement;
 const search = new SearchBar(searchBar);
+const createProjectBtn = document.getElementById("create-project");
 const projects = document.querySelector(".projects");
 
 // Event listeners
@@ -29,127 +30,145 @@ minimizeBtn.addEventListener("click", async (event) => {
     await window.electronAPI.minimize();
 });
 
-cloneProjectBtn.addEventListener("click", async () => {
-    if (!isGitInstalled) {
-        const modal = new Modal(
-            "Git not installed",
-            `
-                <p>Git is not installed on your system.</p>
-            `,
-            null,
-            false,
-            true,
-        );
-
-        modal.show();
-        return;
-    }
-
-    const modal = new Modal(
-        "Clone project",
+new Menu(moreOptionsBtn, [
+    new MenuItem(
         `
-            <style>
-                .container {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 10px;
-                }
-
-                .warning-message {
-                    padding: 10px;
-                    border-radius: 15px;
-                    background-color: rgba(228, 208, 255, .1);
-                    color: rgba(228, 208, 255, .5);
-                    border: 1px solid rgba(228, 208, 255, .25);
-                    font-size: 14px;
-                }
-
-                .separator {
-                    width: 100%;
-                    height: 1px;
-                    background-color: rgb(45, 45, 50);
-                }
-
-                .switch-container {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    gap: 10px;
-                    color: rgba(255, 255, 255, .75);
-                }
-
-                .switch-container p {
-                    font-size: 16px;
-                    word-break: break-word;
-                }
-
-                .container:has(#use-repository-name[checked]) #name {
-                    display: none;
-                }
-
-                .container:has(#use-repository-name[checked]) #name-separator {
-                    display: none;
-                }
-            </style>
-            <div class="container">
-                <p class="warning-message">Make sure to have access to the repository, otherwise you won't be able to clone it.</p>
-                <ascended-text-input id="url" placeholder="username/repository" label="Repository URL"></ascended-text-input>
-                <div class="separator"></div>
-                <div class="switch-container">
-                    <p>Use repository as project name</p>
-                    <ascended-switch id="use-repository-name" checked></ascended-switch>
-                </div>
-                <div class="separator" id="name-separator"></div>
-                <ascended-text-input id="name" placeholder="Project name" label="Project name"></ascended-text-input>
-            </div>
+            <span class="icons">&#xE838;</span>
+            <p>Open projects folder</p>
         `,
-        [
-            "<ascended-button cancel>Cancel</ascended-button>",
-            "<ascended-button action primary primary-color='208, 188, 255'>Clone</ascended-button>",
-        ],
-        null,
-        true,
-    );
-    const modalInput = modal.modalContent.shadowRoot.querySelector("#url");
-    const modalNameInput = modal.modalContent.shadowRoot.querySelector("#name");
-    const useRepositoryNameSwitch = modal.modalContent.shadowRoot.querySelector("#use-repository-name");
-
-    modal.addEventListener(modal.EVENTS.ASK_EXIT.name, async () => {
-        let URL = modalInput.value;
-        const parseURL = (input) => {
-            if (!input || typeof input !== "string") return null;
-
-            input = input.trim();
-
-            input = input.replace(/^https?:\/\//, "").replace(/^www\./, "");
-
-            if (input.startsWith("git@github.com:")) {
-                input = input.slice("git@github.com:".length);
-            }
-            if (input.startsWith("github.com/")) {
-                input = input.slice("github.com/".length);
-            }
-
-            const parts = input.split("/").filter(Boolean);
-            if (parts.length < 2) return null;
-
-            const user = parts[0];
-            const repo = parts[1].replace(/\.git$/, "");
-
-            return `https://github.com/${user}/${repo}`;
+        () => {
+            openProjectsFolderFn();
         }
-        let fixedURL = parseURL(URL);
-
-        const projectName = useRepositoryNameSwitch.checked ? fixedURL.split("/").pop() : modalNameInput.value;
-
-        if (projectName.length === 0) {
-            modal.denyExit();
-            return;
+    ),
+    new MenuItem("Separator"),
+    new MenuItem(
+        `
+            <span class="icons">&#xE756;</span>
+            <p>Open terminal</p>
+        `,
+        () => {
+            openTerminalFn();
         }
+    ),
+], null, true);
 
-        const waitingModal = new Modal(
-            "Deleting project",
-            `
+new Menu(gitOptionsBtn, [
+    new MenuItem(
+        `
+            <span class="icons">&#xE8C8;</span>
+            <p>Clone</p>
+        `,
+        () => {
+            if (!isGitInstalled) {
+                const modal = new Modal(
+                    "Git not installed",
+                    `
+                        <p>Git is not installed on your system.</p>
+                    `,
+                    null,
+                    false,
+                    true,
+                );
+
+                modal.show();
+                return;
+            }
+
+            const modal = new Modal(
+                "Clone project",
+                `
+                    <style>
+                        .container {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 10px;
+                        }
+
+                        .separator {
+                            width: 100%;
+                            height: 1px;
+                            background-color: rgb(45, 45, 50);
+                        }
+
+                        .switch-container {
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            gap: 10px;
+                            color: rgba(255, 255, 255, .75);
+                        }
+
+                        .switch-container p {
+                            font-size: 16px;
+                            word-break: break-word;
+                        }
+
+                        .container:has(#use-repository-name[checked]) #name {
+                            display: none;
+                        }
+
+                        .container:has(#use-repository-name[checked]) #name-separator {
+                            display: none;
+                        }
+                    </style>
+                    <div class="container">
+                        <div class="switch-container">
+                            <p>Use repository name</p>
+                            <ascended-switch id="use-repository-name" checked accent accent-color="208, 188, 255"></ascended-switch>
+                        </div>
+                        <div class="separator" id="name-separator"></div>
+                        <ascended-text-input id="name" placeholder="Project name" label="Project name"></ascended-text-input>
+                        <div class="separator"></div>
+                        <ascended-text-input id="url" placeholder="username/repository" label="Repository URL"></ascended-text-input>
+                    </div>
+                `,
+                [
+                    "<ascended-button cancel>Cancel</ascended-button>",
+                    "<ascended-button action accent accent-color='208, 188, 255'>Clone</ascended-button>",
+                ],
+                null,
+                true,
+            );
+            const modalInput = modal.modalContent.shadowRoot.querySelector("#url");
+            const modalNameInput = modal.modalContent.shadowRoot.querySelector("#name");
+            const useRepositoryNameSwitch = modal.modalContent.shadowRoot.querySelector("#use-repository-name");
+
+            modal.addEventListener(modal.EVENTS.ASK_EXIT.name, async () => {
+                let URL = modalInput.value;
+                const parseURL = (input) => {
+                    if (!input || typeof input !== "string") return null;
+
+                    input = input.trim();
+
+                    input = input.replace(/^https?:\/\//, "").replace(/^www\./, "");
+
+                    if (input.startsWith("git@github.com:")) {
+                        input = input.slice("git@github.com:".length);
+                    }
+                    if (input.startsWith("github.com/")) {
+                        input = input.slice("github.com/".length);
+                    }
+
+                    const parts = input.split("/").filter(Boolean);
+                    if (parts.length < 2) return null;
+
+                    const user = parts[0];
+                    const repo = parts[1].replace(/\.git$/, "");
+
+                    return `https://github.com/${user}/${repo}`;
+                }
+                let fixedURL = parseURL(URL);
+
+                const projectName = useRepositoryNameSwitch.checked ? fixedURL.split("/").pop() : modalNameInput.value;
+
+                if (projectName.length === 0) {
+                    modal.denyExit();
+                    return;
+                }
+
+                const waitingModal = new Modal(
+                    "Deleting project",
+                    `
                         <style>
                             .container {
                                 overflow: hidden;
@@ -179,32 +198,26 @@ cloneProjectBtn.addEventListener("click", async () => {
                             <div class="spinner"></div>
                         </div>
                     `,
-            [],
-            null,
-            true,
-        );
+                    [],
+                    null,
+                    true,
+                );
 
-        waitingModal.show();
+                waitingModal.show();
 
-        await window.electronAPI.cloneProject(fixedURL, projectName);
+                await window.electronAPI.cloneProject(fixedURL, projectName);
 
-        waitingModal.authorizeExit();
+                waitingModal.authorizeExit();
 
-        modal.authorizeExit();
-        await updateProjects();
-    });
+                modal.authorizeExit();
+                await updateProjects();
+            });
 
-    modal.show();
-    modalInput.focus();
-});
-
-openProjectsFolderBtn.addEventListener("click", () => {
-    openProjectsFolderFn();
-});
-
-terminalBtn.addEventListener("click", () => {
-    openTerminalFn();
-});
+            modal.show();
+            modalInput.focus();
+        }
+    )
+], null, true);
 
 configurationBtn.addEventListener("click", async () => {
     const config = await window.electronAPI.getConfig();
@@ -257,18 +270,13 @@ configurationBtn.addEventListener("click", async () => {
             <div class="section">
                 <div class="title">General</div>
                 <div class="switch-container">
-                    <p>Reduced motion</p>
-                    <ascended-switch id="reduced-motion" ${config.reducedMotion ? "checked" : ""}></ascended-switch>
-                </div>
-                <div class="separator"></div>
-                <div class="switch-container">
                     <p>Ripples</p>
-                    <ascended-switch id="ripples" ${config.ripples ? "checked" : ""}></ascended-switch>
+                    <ascended-switch id="ripples" ${config.ripples ? "checked" : ""} accent accent-color="208, 188, 255"></ascended-switch>
                 </div>
                 <div class="separator"></div>
                 <div class="switch-container">
                     <p>Open projects on creation</p>
-                    <ascended-switch id="open-projects-on-creation" ${config.openProjectsOnCreation ? "checked" : ""}></ascended-switch>
+                    <ascended-switch id="open-projects-on-creation" ${config.openProjectsOnCreation ? "checked" : ""} accent accent-color="208, 188, 255"></ascended-switch>
                 </div>
             </div>
             <div class="section">
@@ -280,7 +288,7 @@ configurationBtn.addEventListener("click", async () => {
         `,
         [
             "<ascended-button cancel>Cancel</ascended-button>",
-            "<ascended-button action primary primary-color='208, 188, 255'>Save</ascended-button>",
+            "<ascended-button action accent accent-color='208, 188, 255'>Save</ascended-button>",
         ],
         null,
         true,
@@ -288,7 +296,6 @@ configurationBtn.addEventListener("click", async () => {
 
     const root = modal.modalContent.shadowRoot;
 
-    const reducedMotionSwitch = root.querySelector("#reduced-motion");
     const ripplesSwitch = root.querySelector("#ripples");
     const openProjectsOnCreationSwitch = root.querySelector("#open-projects-on-creation");
     const codeEditorCommandInput = root.querySelector("#code-editor-command");
@@ -307,12 +314,12 @@ configurationBtn.addEventListener("click", async () => {
                 </style>
 
                 <ascended-text-input id="projects-folder-input" type="text" placeholder="New folder path" required></ascended-text-input>
-                <ascended-button id="select-folder" primary primary-color="208, 188, 255">Select folder from explorer</ascended-button>
+                <ascended-button id="select-folder" accent accent-color="208, 188, 255">Select folder from explorer</ascended-button>
                 <ascended-button id="reset-to-default">Reset to default</ascended-button>
             `,
             [
                 "<ascended-button cancel>Cancel</ascended-button>",
-                "<ascended-button action primary primary-color='208, 188, 255'>Change</ascended-button>",
+                "<ascended-button action accent accent-color='208, 188, 255'>Change</ascended-button>",
             ],
             null,
             true,
@@ -353,7 +360,6 @@ configurationBtn.addEventListener("click", async () => {
     });
 
     modal.addEventListener(modal.EVENTS.ASK_EXIT.name, async () => {
-        config.reducedMotion = reducedMotionSwitch.checked;
         config.ripples = ripplesSwitch.checked;
         config.openProjectsOnCreation = openProjectsOnCreationSwitch.checked;
         if (codeEditorCommandInput.value) {
@@ -370,7 +376,6 @@ configurationBtn.addEventListener("click", async () => {
 });
 
 function applyConfig() {
-    document.body.toggleAttribute("reduced-motion", currentConfig.reducedMotion);
     document.body.toggleAttribute("ripples", currentConfig.ripples);
 }
 
@@ -398,33 +403,44 @@ window.electronAPI.onRefreshProjects(async () => {
 
 searchBar.focus();
 
+const createProject = async () => {
+    const projectName = search.normalizeName(searchBar.value);
+    const error = await createProjectFn(projectName);
+
+    if (error) {
+        const errorModal = new Modal(
+            "Error",
+            `
+                <p>An error occurred while creating the project: ${error.message}</p>
+            `,
+            [
+                "<ascended-button accent accent-color='208, 188, 255' cancel>OK</ascended-button>",
+            ],
+            false,
+            true,
+        );
+
+        errorModal.show();
+        return;
+    }
+
+    await updateProjects();
+
+    searchBar.focus();
+}
+
 searchBar.addEventListener("keydown", async (event) => {
     if (event.key === "Enter") {
         event.preventDefault();
         if (searchBar.value) {
-            const error = await createProjectFn(searchBar.value);
-
-            if (error) {
-                const errorModal = new Modal(
-                    "Error",
-                    `
-                        <p>An error occurred while creating the project: ${error.message}</p>
-                    `,
-                    [
-                        "<ascended-button primary primary-color='208, 188, 255' cancel>OK</ascended-button>",
-                    ],
-                    false,
-                    true,
-                );
-
-                errorModal.show();
-                return;
-            }
-
-            await updateProjects();
-            
-            searchBar.focus();
+            createProject();
         }
+    }
+});
+
+createProjectBtn.addEventListener("ascended-button-click", async () => {
+    if (searchBar.value) {
+        createProject();
     }
 });
 
