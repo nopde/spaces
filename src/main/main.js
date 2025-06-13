@@ -88,11 +88,11 @@ function normalizeProjectName(name) {
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
+        minWidth: 600,
         width: 600,
+        minHeight: 700,
         height: 700,
         frame: false,
-        resizable: false,
-        maximizable: false,
         fullscreenable: false,
         icon: img,
         webPreferences: {
@@ -388,6 +388,23 @@ else {
 
         ipcMain.handle("quit", (event) => {
             app.quit();
+        });
+
+        ipcMain.handle("maximize", (event) => {
+            if (mainWindow.isMaximized()) {
+                mainWindow.unmaximize();
+            }
+            else {
+                mainWindow.maximize();
+            }
+        });
+
+        mainWindow.on("maximize", () => {
+            mainWindow.webContents.send("onMaximize", true);
+        });
+
+        mainWindow.on("unmaximize", () => {
+            mainWindow.webContents.send("onMaximize", false);
         });
 
         ipcMain.handle("minimize", (event) => {

@@ -10,6 +10,8 @@ let currentConfig = null;
 let isGitInstalled = null;
 
 const quitBtn = document.getElementById("quit");
+const maximizeBtn = document.getElementById("maximize");
+const maximizeBtnSpan = maximizeBtn.querySelector("span.icons");
 const minimizeBtn = document.getElementById("minimize");
 const moreOptionsBtn = document.getElementById("more-options");
 const gitOptionsBtn = document.getElementById("git-options");
@@ -24,6 +26,19 @@ const projects = document.querySelector(".projects");
 
 quitBtn.addEventListener("click", async (event) => {
     await window.electronAPI.quit();
+});
+
+maximizeBtn.addEventListener("click", async () => {
+    await window.electronAPI.maximize();
+});
+
+window.electronAPI.onMaximize((isMaximized) => {
+    if (isMaximized) {
+        maximizeBtnSpan.innerHTML = "&#xE923;";
+    }
+    else {
+        maximizeBtnSpan.innerHTML = "&#xE922;";
+    }
 });
 
 minimizeBtn.addEventListener("click", async (event) => {

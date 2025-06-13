@@ -33,6 +33,12 @@ contextBridge.exposeInMainWorld("electronAPI", {
         return ipcRenderer.invoke("cloneProject", url, projectName);
     },
     quit: () => ipcRenderer.invoke("quit"),
+    maximize: () => {
+        return ipcRenderer.invoke("maximize");
+    },
+    onMaximize: (callback) => {
+        ipcRenderer.on("onMaximize", (_event, isMaximized) => callback(isMaximized));
+    },
     minimize: () => ipcRenderer.invoke("minimize"),
     onResetScroll: (callback) => ipcRenderer.on("reset-scroll", callback),
     onRefreshProjects: (callback) => ipcRenderer.on("refresh-projects", callback),
