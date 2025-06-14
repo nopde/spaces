@@ -2,7 +2,7 @@ import { SearchBar } from "./modules/searchbar.js";
 import { createProjectsFolderFn, createProjectFn, openProjectsFolderFn, openTerminalFn } from "./modules/preload_functions.js";
 import { updateProjects } from "./modules/projects.js";
 import { Modal } from "./modules/ascended-framework/modal.js";
-import { Menu, MenuItem } from "./modules/menu.js";
+import { Menu, MenuItem } from "./modules/ascended-framework/menu.js";
 
 // Variables
 

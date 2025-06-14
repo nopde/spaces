@@ -1,3 +1,5 @@
+import { RippleHandler } from "./utils.js";
+
 class MenuItem {
     constructor(content, callback = () => { }) {
         this.content = content;
@@ -92,6 +94,7 @@ class Menu {
                 }
 
                 .menu-item {
+                    position: relative;
                     display: flex;
                     align-items: center;
                     justify-content: start;
@@ -105,10 +108,6 @@ class Menu {
 
                 .menu-item:hover {
                     background-color: rgba(0, 0, 0, .25);
-                }
-
-                .menu-item:hover:active {
-                    filter: brightness(.75);
                 }
 
                 .separator-item {
@@ -154,6 +153,8 @@ class Menu {
                     this.toggle();
                 }
             });
+
+            new RippleHandler(menuItem, "255, 255, 255", .16, true);
 
             this.menuElement.appendChild(menuItem);
         });

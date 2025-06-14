@@ -57,13 +57,13 @@ class Button extends HTMLElement {
                     background-color: rgba(255, 255, 255, .2);
                 }
 
-                .button.accent {
+                .button[accent] {
                     background-color: rgb(${this.accentColor});
                     color: rgb(30, 30, 30);
                 }
 
-                .button.accent:hover,
-                .button.accent:hover:active {
+                .button[accent]:hover,
+                .button[accent]:hover:active {
                     background-color: rgb(${this.accentColor});
                     filter: brightness(0.85);
                 }
@@ -86,7 +86,7 @@ class Button extends HTMLElement {
                 }
             </style>
 
-            <button class="button ${this.accent ? "accent" : ""}" ${this.disabled ? "disabled" : ""} ${this.elevated ? "elevated" : ""}>${this.content}</button>
+            <button class="button" ${this.accent ? "accent" : ""} ${this.disabled ? "disabled" : ""} ${this.elevated ? "elevated" : ""}>${this.content}</button>
         `;
 
         this.EVENTS = {

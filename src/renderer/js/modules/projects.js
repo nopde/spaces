@@ -1,6 +1,6 @@
 import { Modal } from "./ascended-framework/modal.js";
 import { RippleHandler } from "./ascended-framework/utils.js";
-import { Menu, MenuItem } from "./menu.js";
+import { Menu, MenuItem } from "./ascended-framework/menu.js";
 import { codeProjectFn, openProjectFolderFn, getProjectsFn, openTerminalFn, renameProjectFn, deleteProjectFn } from "./preload_functions.js";
 
 const searchBar = document.getElementById("search");
@@ -221,7 +221,7 @@ export const updateProjects = async () => {
                         <span class="icons">&#xE8AD;</span>
                         <p class="text">Open</p>
                     </ascended-button>
-                    <ascended-button id="${projectName} moreSettings" rounded rounded-size="40">
+                    <ascended-button id="${projectName} moreSettings">
                         <span class="icons">&#xE712;</span>
                     </ascended-button>
                 </div>
