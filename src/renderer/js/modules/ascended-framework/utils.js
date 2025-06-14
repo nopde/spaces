@@ -101,22 +101,22 @@ class RippleHandler {
                 offsetX = event.clientX - rect.left,
                 offsetY = event.clientY - rect.top;
 
-            const size = Math.max(rect.height, rect.width);
+            const max = Math.max(rect.height, rect.width);
             const min = Math.min(rect.height, rect.width);
             let properSize = 0;
 
-            if (min <= size / 2) {
-                properSize = size * 1.5;
+            if (min <= max / 2) {
+                properSize = max * 1.5;
 
                 if (rippleNoGradient) {
-                    properSize = size * 1.05;
+                    properSize = max * 1.05;
                 }
             }
             else {
-                properSize = size * (1 + min / size);
+                properSize = max * (1 + min / max);
 
                 if (rippleNoGradient) {
-                    properSize = size * 1.25;
+                    properSize = max * 1.25;
                 }
             }
 
