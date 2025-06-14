@@ -109,7 +109,7 @@ class RippleHandler {
                 properSize = size * 1.5;
 
                 if (rippleNoGradient) {
-                    properSize = size;
+                    properSize = size * 1.05;
                 }
             }
             else {
@@ -126,6 +126,8 @@ class RippleHandler {
                 ripple.style.animation = "grow .25s cubic-bezier(0.25, 1, 0.5, 1) forwards";
                 finishDelay = 150;
             }
+
+            properSize = Math.round(properSize);
 
             ripple.style.width = `${properSize}px`;
             ripple.style.height = `${properSize}px`;
