@@ -19,7 +19,6 @@ const img = nativeImage.createFromPath(iconPath);
 const configPath = path.join(app.getPath("userData"), "config.json");
 
 const defaultConfig = {
-    ripples: true,
     openProjectsOnCreation: false,
     codeEditorCommand: "code",
     defaultProjectsFolder: path.join(app.getPath("userData"), "Projects"),
@@ -255,6 +254,10 @@ else {
         ipcMain.handle("getProjects", async (event) => {
             const folderPath = config.projectsFolder;
 
+            if (!fs.existsSync(folderPath)) {
+                fs.mkdirSync(folderPath);
+            }
+
             try {
                 const files = await fs.promises.readdir(folderPath);
                 const folders = files.filter((name) => fs.statSync(path.join(folderPath, name)).isDirectory());
@@ -379,8 +382,9 @@ else {
             try {
                 const folderPath = path.join(config.projectsFolder, projectName);
                 let errorMsg = false;
-                execute(`git clone ${url} ${folderPath}`, null, () => { errorMsg = true; });
-                return errorMsg;
+                return new Promise((resolve, reject) => {
+                    execute(`git clone ${url} ${folderPath}`, () => { resolve(errorMsg); }, () => { reject(errorMsg); });
+                });
             } catch (error) {
                 console.error(error.message);
             }

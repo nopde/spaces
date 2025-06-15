@@ -90,7 +90,7 @@ new Menu(gitOptionsBtn, [
             }
 
             const modal = new Modal(
-                "Clone project",
+                "Clone repository",
                 `
                     <style>
                         .container {
@@ -117,24 +117,15 @@ new Menu(gitOptionsBtn, [
                             font-size: 16px;
                             word-break: break-word;
                         }
-
-                        .container:has(#use-repository-name[checked]) #name {
-                            display: none;
-                        }
-
-                        .container:has(#use-repository-name[checked]) #name-separator {
-                            display: none;
-                        }
                     </style>
                     <div class="container">
                         <div class="switch-container">
                             <p>Use repository name</p>
                             <ascended-switch id="use-repository-name" checked accent accent-color="208, 188, 255"></ascended-switch>
                         </div>
-                        <div class="separator" id="name-separator"></div>
-                        <ascended-text-input id="name" placeholder="Project name" label="Project name"></ascended-text-input>
                         <div class="separator"></div>
-                        <ascended-text-input id="url" placeholder="username/repository" label="Repository URL"></ascended-text-input>
+                        <ascended-text-input id="name" icon="<span class='icons'>&#xEBC6;</span>" placeholder="Project name" label="Project name"></ascended-text-input>
+                        <ascended-text-input id="url" icon="<span class='icons'>&#xE71B;</span>" placeholder="Username / Repository" label="Repository URL"></ascended-text-input>
                     </div>
                 `,
                 [
@@ -147,6 +138,17 @@ new Menu(gitOptionsBtn, [
             const modalInput = modal.modalContent.shadowRoot.querySelector("#url");
             const modalNameInput = modal.modalContent.shadowRoot.querySelector("#name");
             const useRepositoryNameSwitch = modal.modalContent.shadowRoot.querySelector("#use-repository-name");
+
+            modalNameInput.hide();
+
+            useRepositoryNameSwitch.addEventListener("ascended-switch-toggle", () => {
+                if (useRepositoryNameSwitch.checked) {
+                    modalNameInput.hide();
+                }
+                else {
+                    modalNameInput.show();
+                }
+            });
 
             modal.addEventListener(modal.EVENTS.ASK_EXIT.name, async () => {
                 let URL = modalInput.value;
@@ -181,8 +183,10 @@ new Menu(gitOptionsBtn, [
                     return;
                 }
 
+                modal.authorizeExit();
+
                 const waitingModal = new Modal(
-                    "Deleting project",
+                    "Cloning repository",
                     `
                         <style>
                             .container {
@@ -224,7 +228,6 @@ new Menu(gitOptionsBtn, [
 
                 waitingModal.authorizeExit();
 
-                modal.authorizeExit();
                 await updateProjects();
             });
 
@@ -277,28 +280,41 @@ configurationBtn.addEventListener("click", async () => {
                     word-break: break-word;
                 }
 
-                #change-projects-folder {
-                    width: 100%;
+                .input-container {
+                    display: flex;
+                    align-items: end;
+                    gap: 5px;
+                }
+
+                .input-container ascended-text-input {
+                    flex: 1 1;
+                }
+
+                .input-container ascended-button {
+                    height: 37px;
                 }
             </style>
 
             <div class="section">
                 <div class="title">General</div>
                 <div class="switch-container">
-                    <p>Ripples</p>
-                    <ascended-switch id="ripples" ${config.ripples ? "checked" : ""} accent accent-color="208, 188, 255"></ascended-switch>
-                </div>
-                <div class="separator"></div>
-                <div class="switch-container">
                     <p>Open projects on creation</p>
                     <ascended-switch id="open-projects-on-creation" ${config.openProjectsOnCreation ? "checked" : ""} accent accent-color="208, 188, 255"></ascended-switch>
+                </div>
+                <div class="separator"></div>
+                <div class="input-container">
+                    <ascended-text-input id="projects-folder-input" icon="<span class='icons'>&#xE8B7;</span>" label="Projects folder" placeholder="New folder path" required></ascended-text-input>
+                    <ascended-button id="select-folder" accent accent-color="208, 188, 255">
+                        <span class="icons">&#xE838;</span>
+                    </ascended-button>
+                    <ascended-button id="reset-to-default">
+                        <span class="icons">&#xE72C;</span>
+                    </ascended-button>
                 </div>
             </div>
             <div class="section">
                 <p class="title">Advanced</p>
-                <ascended-text-input id="code-editor-command" placeholder="Code" label="Code editor command"></ascended-text-input>
-                <div class="separator"></div>
-                <ascended-button id="change-projects-folder">Change projects folder</ascended-button>
+                <ascended-text-input id="code-editor-command" icon="<span class='icons'>&#xE756;</span>" placeholder="Command (e.g. code)" label="Code editor command"></ascended-text-input>
             </div>
         `,
         [
@@ -311,77 +327,46 @@ configurationBtn.addEventListener("click", async () => {
 
     const root = modal.modalContent.shadowRoot;
 
-    const ripplesSwitch = root.querySelector("#ripples");
     const openProjectsOnCreationSwitch = root.querySelector("#open-projects-on-creation");
     const codeEditorCommandInput = root.querySelector("#code-editor-command");
-    const changeProjectsFolderBtn = root.querySelector("#change-projects-folder");
+    const projectsFolderInput = modal.modalContent.shadowRoot.querySelector("#projects-folder-input");
+    const selectFolderBtn = modal.modalContent.shadowRoot.querySelector("#select-folder");
+    const resetToDefaultBtn = modal.modalContent.shadowRoot.querySelector("#reset-to-default");
 
-    codeEditorCommandInput.setValue(config.codeEditorCommand);
-
-    changeProjectsFolderBtn.addEventListener("ascended-button-click", async () => {
-        const modal = new Modal(
-            "Change projects folder",
-            `
-                <style>
-                    ascended-button {
-                        width: 100%;
-                    }
-                </style>
-
-                <ascended-text-input id="projects-folder-input" type="text" placeholder="New folder path" required></ascended-text-input>
-                <ascended-button id="select-folder" accent accent-color="208, 188, 255">Select folder from explorer</ascended-button>
-                <ascended-button id="reset-to-default">Reset to default</ascended-button>
-            `,
-            [
-                "<ascended-button cancel>Cancel</ascended-button>",
-                "<ascended-button action accent accent-color='208, 188, 255'>Change</ascended-button>",
-            ],
-            null,
-            true,
-        );
-        const modalInput = modal.modalContent.shadowRoot.querySelector("#projects-folder-input");
-        const selectFolderBtn = modal.modalContent.shadowRoot.querySelector("#select-folder");
-        const resetToDefaultBtn = modal.modalContent.shadowRoot.querySelector("#reset-to-default");
-
-        selectFolderBtn.addEventListener("ascended-button-click", async () => {
-            const folderPath = await window.electronAPI.selectFolder(config.projectsFolder);
-            if (folderPath) {
-                modalInput.setValue(folderPath);
-            }
-        });
-
-        resetToDefaultBtn.addEventListener("ascended-button-click", async () => {
-            modalInput.setValue(config.defaultProjectsFolder);
-        });
-
-        modal.show();
-        modalInput.setValue(config.projectsFolder);
-        modalInput.focus();
-
-        modal.addEventListener(modal.EVENTS.ASK_EXIT.name, async () => {
-            const newProjectsFolder = modalInput.value;
-            if (newProjectsFolder.length === 0 || newProjectsFolder === config.projectsFolder) {
-                modal.authorizeExit();
-                return;
-            }
-
-            config.projectsFolder = newProjectsFolder;
-
-            await window.electronAPI.updateConfig(config);
-            await updateProjects();
-
-            modal.authorizeExit();
-        });
+    selectFolderBtn.addEventListener("ascended-button-click", async () => {
+        const folderPath = await window.electronAPI.selectFolder(config.projectsFolder);
+        if (folderPath) {
+            projectsFolderInput.setValue(folderPath);
+        }
     });
 
+    resetToDefaultBtn.addEventListener("ascended-button-click", async () => {
+        projectsFolderInput.setValue(config.defaultProjectsFolder);
+    });
+
+    projectsFolderInput.setValue(config.projectsFolder);
+    codeEditorCommandInput.setValue(config.codeEditorCommand);
+
     modal.addEventListener(modal.EVENTS.ASK_EXIT.name, async () => {
-        config.ripples = ripplesSwitch.checked;
         config.openProjectsOnCreation = openProjectsOnCreationSwitch.checked;
         if (codeEditorCommandInput.value) {
             config.codeEditorCommand = codeEditorCommandInput.value;
         }
 
-        await window.electronAPI.updateConfig(config);
+        const newProjectsFolder = projectsFolderInput.value;
+        if (newProjectsFolder.length != 0 || newProjectsFolder != config.projectsFolder) {
+            config.projectsFolder = newProjectsFolder;
+        }
+
+        try {
+            await window.electronAPI.updateConfig(config);
+        }
+        catch (error) {
+            console.error(error.message);
+            return;
+        }
+
+    
         await updateProjects();
 
         modal.authorizeExit();
@@ -390,15 +375,9 @@ configurationBtn.addEventListener("click", async () => {
     modal.show();
 });
 
-function applyConfig() {
-    document.body.toggleAttribute("ripples", currentConfig.ripples);
-}
-
 // Initialization
 
 currentConfig = await window.electronAPI.getConfig();
-applyConfig();
-
 isGitInstalled = await window.electronAPI.isGitInstalled();
 
 window.electronAPI.onResetScroll(() => {
@@ -409,7 +388,6 @@ window.electronAPI.onResetScroll(() => {
 
 window.electronAPI.onConfigChange((newConfig) => {
     currentConfig = newConfig;
-    applyConfig();
 });
 
 window.electronAPI.onRefreshProjects(async () => {

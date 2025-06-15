@@ -41,8 +41,8 @@ class Modal extends HTMLElement {
                     border-radius: 25px;
                     padding: 20px;
                     min-width: 350px;
-                    max-width: 50%;
-                    max-height: 60%;
+                    max-width: 70%;
+                    max-height: 70%;
                     display: flex;
                     flex-direction: column;
                 }

@@ -68,10 +68,6 @@ class Button extends HTMLElement {
                     filter: brightness(0.85);
                 }
 
-                :host:host-context(body:not([ripples])) .button:hover:active {
-                    filter: brightness(0.75);
-                }
-
                 .button[disabled] {
                     opacity: .5;
                     pointer-events: none;
@@ -79,10 +75,6 @@ class Button extends HTMLElement {
 
                 .button[elevated] {
                     box-shadow: 0 0 10px rgba(0, 0, 0, .25);
-                }
-
-                :host:host-context(body:not([ripples])) .button ripple-surface {
-                    display: none;
                 }
             </style>
 
@@ -127,7 +119,9 @@ class TextInput extends HTMLElement {
         this.label = this.hasAttribute("label") ? this.getAttribute("label") : "";
 
         this.valueAttr = this.hasAttribute("value") ? `value="${this.getAttribute("value")}"` : "";
-        this.placeholderAttr = this.hasAttribute("placeholder") ? `placeholder="${this.getAttribute("placeholder")}"` : "";
+
+        this.placeholder = this.hasAttribute("placeholder") ? this.getAttribute("placeholder") : "";
+        this.icon = this.hasAttribute("icon") ? this.getAttribute("icon") : "";
 
         this.censored = this.hasAttribute("censored");
         this.disabled = this.hasAttribute("disabled");
@@ -164,7 +158,8 @@ class TextInput extends HTMLElement {
                     font-weight: inherit;
                     min-width: 0;
                     width: 100%;
-                    padding: 10px 20px;
+                    padding-block: 10px;
+                    padding-left: ${this.icon ? "40px" : "20px"};
                     padding-right: 35px;
                     border: none;
                     outline: none;
@@ -192,10 +187,6 @@ class TextInput extends HTMLElement {
                     pointer-events: none;
                 }
 
-                .text-input::placeholder {
-                    color: rgba(255, 255, 255, .5);
-                }
-
                 .clear-input {
                     --scale: 0;
                     position: absolute;
@@ -221,32 +212,71 @@ class TextInput extends HTMLElement {
                     scale: var(--scale);
                 }
 
-                .clear-input:hover:active {
-                    background-color: rgba(255, 255, 255, .3);
-                }
-
                 .clear-input.hidden {
                     opacity: 0;
                     transform: translateX(20px) scale(0);
+                }
+
+                .placeholder-container {
+                    position: absolute;
+                    top: 0;
+                    left: ${this.icon ? "40px" : "20px"};
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    pointer-events: none;
+                }
+
+                .placeholder-container.hidden {
+                    opacity: 0;
+                }
+
+                .placeholder {
+                    color: rgba(255, 255, 255, .5);
+                }
+
+                .icon-container {
+                    position: absolute;
+                    top: 0;
+                    left: 15px;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    pointer-events: none;
+                    color: rgba(255, 255, 255, .5);
+                    transition: color 75ms linear;
+                }
+
+                .icon-container.hidden {
+                    opacity: 0;
+                }
+
+                :host:has(.text-input:hover) .icon-container,
+                :host:has(.text-input:focus) .icon-container {
+                    color: rgba(255, 255, 255, .75);
                 }
             </style>
 
             ${this.label ? `<p class="label">${this.label}</p>` : ""}
             <div class="text-input-container">
-                <input class="text-input" ${this.disabled ? "disabled" : ""} ${this.censored ? "type='password'" : "type='text'"} ${this.valueAttr} ${this.placeholderAttr} spellcheck="false" autocomplete="off">
+                <input class="text-input" ${this.disabled ? "disabled" : ""} ${this.censored ? "type='password'" : "type='text'"} ${this.valueAttr} spellcheck="false" autocomplete="off">
+                <div class="placeholder-container">
+                    <span class="placeholder">${this.placeholder}</span>
+                </div>
+                <div class="icon-container">${this.icon}</div>
                 <span class="clear-input hidden"><span class="icons">&#xE894;</span></span>
             </div>
         `;
 
         this.textInputElement = shadow.querySelector("input");
         this.clearInputElement = shadow.querySelector(".clear-input");
+        this.placeholderContainer = shadow.querySelector(".placeholder-container");
 
         this.setupEventListeners();
     }
 
-    connectedCallback() {
-        this.value = this.textInputElement.value;
-
+    calculateClearInputSize() {
         const textInputHeight = this.textInputElement.getBoundingClientRect().height;
         const clearInputSize = Math.round(textInputHeight) - 10;
         const scale = textInputHeight / clearInputSize;
@@ -257,13 +287,23 @@ class TextInput extends HTMLElement {
         this.clearInputElement.style.setProperty("--scale", scale);
     }
 
+    connectedCallback() {
+        this.value = this.textInputElement.value;
+
+        this.calculateClearInputSize();
+
+        new RippleHandler(this.clearInputElement, "255, 255, 255", .16, true);
+    }
+
     setupEventListeners() {
         this.textInputElement.addEventListener("input", () => {
             if (this.textInputElement.value.length > 0) {
                 this.clearInputElement.classList.remove("hidden");
+                this.placeholderContainer.classList.add("hidden");
             }
             else {
                 this.clearInputElement.classList.add("hidden");
+                this.placeholderContainer.classList.remove("hidden");
                 return;
             }
 
@@ -296,6 +336,15 @@ class TextInput extends HTMLElement {
 
     _inputEvent() {
         this.textInputElement.dispatchEvent(new Event("input", { bubbles: true, composed: true }));
+    }
+
+    show() {
+        this.style.display = "block";
+        requestAnimationFrame(() => { this.calculateClearInputSize(); });
+    }
+
+    hide() {
+        this.style.display = "none";
     }
 }
 
