@@ -223,6 +223,7 @@ export const updateProjects = async () => {
                     </ascended-button>
                     <ascended-button id="${projectName} moreSettings">
                         <span class="icons">&#xE712;</span>
+                        <ascended-tooltip>More options</ascended-tooltip>
                     </ascended-button>
                 </div>
             `;

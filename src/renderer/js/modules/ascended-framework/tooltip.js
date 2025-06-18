@@ -21,16 +21,10 @@ class Tooltip extends HTMLElement {
 
                 :host {
                     position: absolute;
-                    z-index: 100;
+                    z-index: 999;
                     left: 0;
                     right: 0;
                     top: 100%;
-                    scale: .5;
-                    transition: scale 250ms cubic-bezier(.175, .885, .32, 1.275);
-                }
-
-                :host:has(.tooltip.active) {
-                    scale: 1;
                 }
 
                 .tooltip {
@@ -38,6 +32,7 @@ class Tooltip extends HTMLElement {
                     align-items: center;
                     justify-content: center;
                     position: absolute;
+                    z-index: 999;
                     top: calc(100% + 10px);
                     width: max-content;
                     background-color: white;
@@ -49,7 +44,7 @@ class Tooltip extends HTMLElement {
                     pointer-events: none;
                     white-space: nowrap;
                     opacity: 0;
-                    transition: opacity 75ms linear;
+                    transition: opacity 100ms ease;
                 }
 
                 .tooltip.active {
@@ -58,6 +53,7 @@ class Tooltip extends HTMLElement {
 
                 .triangle {
                     position: absolute;
+                    z-index: 999;
                     top: 100%;
                     left: 50%;
                     transform: translateX(-50%);
@@ -65,7 +61,7 @@ class Tooltip extends HTMLElement {
                     border-style: solid;
                     border-color: transparent transparent white transparent;
                     opacity: 0;
-                    transition: opacity 75ms linear;
+                    transition: opacity 100ms ease;
                 }
 
                 .triangle.active {
