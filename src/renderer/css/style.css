@@ -18,6 +18,8 @@
     user-select: none;
     box-sizing: border-box;
     text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 html {
@@ -187,7 +189,8 @@ body {
     flex: 1 1;
     display: flex;
     flex-direction: column;
-    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
     padding-block: 10px;
     padding-left: 20px;
     padding-right: 5px;

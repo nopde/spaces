@@ -75,13 +75,15 @@ class Tooltip extends HTMLElement {
         this.tooltip = this.shadowRoot.querySelector(".tooltip");
         this.triangle = this.shadowRoot.querySelector(".triangle");
 
-        this.parentElement.addEventListener("mouseenter", () => {
-            this.toggle();
-        });
-        
-        this.parentElement.addEventListener("mouseleave", () => {
-            this.toggle();
-        });
+        if (this.parentElement) {
+            this.parentElement.addEventListener("mouseenter", () => {
+                this.toggle();
+            });
+
+            this.parentElement.addEventListener("mouseleave", () => {
+                this.toggle();
+            });
+        }
     }
 
     connectedCallback() {

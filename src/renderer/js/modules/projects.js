@@ -197,12 +197,10 @@ export const updateProjects = async () => {
                             }
 
                             .icons {
-                                rotate: 45deg;
-                                transition: all 250ms cubic-bezier(.175, .885, .32, 1.275);
+                                transition: margin-right 250ms cubic-bezier(.175, .885, .32, 1.275);
                             }
 
                             :host(:hover) .icons {
-                                rotate: 0deg;
                                 margin-right: 45px;
                             }
 

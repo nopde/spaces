@@ -1,13 +1,17 @@
 @font-face {
     font-family: "Inter";
+    font-display: swap;
     font-weight: 100 900;
     font-style: normal;
+    font-feature-settings: "liga", "kern";
     src: url("inter.ttf") format("truetype");
 }
 
 @font-face {
     font-family: "Inter";
+    font-display: swap;
     font-weight: 100 900;
     font-style: italic;
+    font-feature-settings: "liga", "kern";
     src: url("inter-italic.ttf") format("truetype");
 }
